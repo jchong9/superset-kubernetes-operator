@@ -1469,7 +1469,7 @@ under the License.
 </tr>
 </tbody>
 </table>
-<p>See <a href="https://apache.github.io/superset-kubernetes-operator/reference/downloads/">Downloads</a> for full details on published images and registries.</p>
+<p>See <a href="https://jchong9.github.io/superset-kubernetes-operator/reference/downloads/">Downloads</a> for full details on published images and registries.</p>
 <p>Before creating the first RC for a minor release, run or verify:</p>
 <ul>
 <li><code>make codegen</code> leaves no diff</li>
@@ -1483,7 +1483,7 @@ under the License.
 <li>The release workflow is using pinned/checksum-verified tool downloads</li>
 </ul>
 <h2 id="reviewing-the-changelog">Reviewing the Changelog<a class="headerlink" href="#reviewing-the-changelog" title="Permanent link">&para;</a></h2>
-<p>Contributors add bullets to <code>## Unreleased</code> in <a href="https://apache.github.io/superset-kubernetes-operator/reference/releases/"><code>docs/reference/releases.md</code></a> as PRs land (see the <a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-guidelines/#changelog-entry">changelog convention</a>). Before tagging the RC, the release manager does one review pass to make sure the section accurately reflects the release:</p>
+<p>Contributors add bullets to <code>## Unreleased</code> in <a href="https://jchong9.github.io/superset-kubernetes-operator/reference/releases/"><code>docs/reference/releases.md</code></a> as PRs land (see the <a href="https://jchong9.github.io/superset-kubernetes-operator/contributing/development-guidelines/#changelog-entry">changelog convention</a>). Before tagging the RC, the release manager does one review pass to make sure the section accurately reflects the release:</p>
 <ol>
 <li>Skim <code>git log v&lt;previous&gt;..HEAD</code> for noteworthy changes that nobody added an entry for, and add them. Skim for changes that were added but aren't actually noteworthy (typo fixes, internal refactors that snuck in), and drop them.</li>
 <li>Merge bullets that describe the same user-visible change — separate PRs often touch on a single feature.</li>

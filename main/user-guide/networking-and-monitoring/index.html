@@ -1395,7 +1395,7 @@ under the License.
 <a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prometheus</span>
 <a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">monitoring</span>
 </code></pre></div>
-<p><strong>TLS by default.</strong> The operator generates a self-signed certificate at startup, so scrapers connect over HTTPS with <code>insecureSkipVerify: true</code>. This is the default in both the Kustomize ServiceMonitor (<code>config/prometheus/monitor.yaml</code>) and the Helm chart. It's fine for a trusted cluster but not for zero-trust environments. Authentication and authorization are always enforced via bearer tokens (<code>TokenReview</code>/<code>SubjectAccessReview</code>) regardless of TLS setup — see <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security reference for the trust-model context.</p>
+<p><strong>TLS by default.</strong> The operator generates a self-signed certificate at startup, so scrapers connect over HTTPS with <code>insecureSkipVerify: true</code>. This is the default in both the Kustomize ServiceMonitor (<code>config/prometheus/monitor.yaml</code>) and the Helm chart. It's fine for a trusted cluster but not for zero-trust environments. Authentication and authorization are always enforced via bearer tokens (<code>TokenReview</code>/<code>SubjectAccessReview</code>) regardless of TLS setup — see <a href="https://jchong9.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security reference for the trust-model context.</p>
 <h3 id="enable-via-helm">Enable via Helm<a class="headerlink" href="#enable-via-helm" title="Permanent link">&para;</a></h3>
 <p>The chart ships a ServiceMonitor template, off by default. The minimal opt-in looks like:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">metrics</span><span class="p">:</span>
@@ -1498,7 +1498,7 @@ under the License.
 </tbody>
 </table>
 <p>If you need to restrict external ingress to specific sources, disable the built-in network policy and create your own NetworkPolicy resources with the desired <code>from</code> selectors.</p>
-<p>The built-in policy is ingress segmentation only — egress is intentionally unrestricted so workloads can reach the metastore database, Valkey, SMTP servers, and other user-configured dependencies. For the rationale and hardening path, see <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security reference.</p>
+<p>The built-in policy is ingress segmentation only — egress is intentionally unrestricted so workloads can reach the metastore database, Valkey, SMTP servers, and other user-configured dependencies. For the rationale and hardening path, see <a href="https://jchong9.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security reference.</p>
 
 
 
