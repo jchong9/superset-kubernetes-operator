@@ -61,6 +61,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../../stylesheets/version-banner.css">
+    
     <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
@@ -264,7 +266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started/" class="md-nav__link">
+      <a href="/latest/getting-started/" class="md-nav__link">
         
   
   
@@ -343,7 +345,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/installation/" class="md-nav__link">
+      <a href="/latest/user-guide/installation/" class="md-nav__link">
         
   
   
@@ -370,7 +372,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/configuration/" class="md-nav__link">
+      <a href="/latest/user-guide/configuration/" class="md-nav__link">
         
   
   
@@ -397,7 +399,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/lifecycle/" class="md-nav__link">
+      <a href="/latest/user-guide/lifecycle/" class="md-nav__link">
         
   
   
@@ -424,7 +426,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/networking-and-monitoring/" class="md-nav__link">
+      <a href="/latest/user-guide/networking-and-monitoring/" class="md-nav__link">
         
   
   
@@ -451,7 +453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../user-guide/migration/" class="md-nav__link">
+      <a href="/latest/user-guide/migration/" class="md-nav__link">
         
   
   
@@ -539,7 +541,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/overview/" class="md-nav__link">
+      <a href="/latest/architecture/overview/" class="md-nav__link">
         
   
   
@@ -566,7 +568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../architecture/internals/" class="md-nav__link">
+      <a href="/latest/architecture/internals/" class="md-nav__link">
         
   
   
@@ -654,7 +656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api-reference/" class="md-nav__link">
+      <a href="/latest/reference/api-reference/" class="md-nav__link">
         
   
   
@@ -1549,7 +1551,7 @@ under the License.
 <h3 id="added_1">Added<a class="headerlink" href="#added_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Structured metastore, Valkey, and lifecycle seed-source connection fields can now be sourced individually from Kubernetes Secret keys, allowing <code>Superset</code> resources to consume provisioner-owned endpoints and credentials without copying discovered values or assembling a separate connection URI (<a href="https://github.com/apache/superset-kubernetes-operator/pull/369">#369</a>).</li>
-<li><strong>Helm <code>podDisruptionBudget</code>.</strong> The Helm chart now exposes a <code>podDisruptionBudget</code> value that renders a <a href="https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets">PodDisruptionBudget</a> for the operator manager pods. It is disabled by default and falls back to <code>maxUnavailable: 1</code> when no bound is set. Rendering fails for integer or percentage bounds that would leave zero allowed disruptions at the configured <code>replicas</code> (for example <code>minAvailable: 1</code> with one replica, or <code>maxUnavailable: 0</code>), so the budget never blocks node drains. See <a href="../../user-guide/installation/#high-availability">High availability</a> for the recommended multi-replica setup. <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy"><code>unhealthyPodEvictionPolicy</code></a> can be set to <code>AlwaysAllow</code> so drains can evict a crash-looping manager (<a href="https://github.com/apache/superset-kubernetes-operator/pull/386">#386</a>, <a href="https://github.com/younsl">@younsl</a>).</li>
+<li><strong>Helm <code>podDisruptionBudget</code>.</strong> The Helm chart now exposes a <code>podDisruptionBudget</code> value that renders a <a href="https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets">PodDisruptionBudget</a> for the operator manager pods. It is disabled by default and falls back to <code>maxUnavailable: 1</code> when no bound is set. Rendering fails for integer or percentage bounds that would leave zero allowed disruptions at the configured <code>replicas</code> (for example <code>minAvailable: 1</code> with one replica, or <code>maxUnavailable: 0</code>), so the budget never blocks node drains. See <a href="https://apache.github.io/superset-kubernetes-operator/latest/user-guide/installation/#high-availability">High availability</a> for the recommended multi-replica setup. <a href="https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy"><code>unhealthyPodEvictionPolicy</code></a> can be set to <code>AlwaysAllow</code> so drains can evict a crash-looping manager (<a href="https://github.com/apache/superset-kubernetes-operator/pull/386">#386</a>, <a href="https://github.com/younsl">@younsl</a>).</li>
 </ul>
 <h3 id="changed_1">Changed<a class="headerlink" href="#changed_1" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1609,8 +1611,8 @@ under the License.
 <h3 id="known-limitations">Known limitations<a class="headerlink" href="#known-limitations" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Websocket server is experimental.</strong> The websocket server is not yet well supported and is pending security hardening; it is not recommended for production use.</li>
-<li><strong>Downgrade protection requires semver image tags.</strong> Downgrades are detected and blocked only when both image tags are valid semver. Non-semver tags (<code>latest</code>, date stamps, digest pins) cannot be ordered, so the operator emits a <code>VersionComparisonSkipped</code> warning and proceeds without blocking. See <a href="../../user-guide/lifecycle/">Lifecycle</a>.</li>
-<li><strong>Task failure messages may include credential fragments.</strong> Lifecycle task failure output is truncated into <code>status</code> and could contain fragments of task stdout, including credentials. See <a href="../security/">security.md</a>.</li>
+<li><strong>Downgrade protection requires semver image tags.</strong> Downgrades are detected and blocked only when both image tags are valid semver. Non-semver tags (<code>latest</code>, date stamps, digest pins) cannot be ordered, so the operator emits a <code>VersionComparisonSkipped</code> warning and proceeds without blocking. See <a href="https://apache.github.io/superset-kubernetes-operator/latest/user-guide/lifecycle/">Lifecycle</a>.</li>
+<li><strong>Task failure messages may include credential fragments.</strong> Lifecycle task failure output is truncated into <code>status</code> and could contain fragments of task stdout, including credentials. See <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/">security.md</a>.</li>
 </ul>
 
 
@@ -1677,6 +1679,8 @@ under the License.
     
     
       <script src="../../assets/javascripts/bundle.a2388154.min.js"></script>
+      
+        <script src="../../javascripts/version-switcher.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       

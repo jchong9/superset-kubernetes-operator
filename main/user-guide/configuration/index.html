@@ -61,6 +61,8 @@
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
+      <link rel="stylesheet" href="../../stylesheets/version-banner.css">
+    
     <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
@@ -238,7 +240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="/" class="md-nav__link">
         
   
   
@@ -1222,7 +1224,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/downloads/" class="md-nav__link">
+      <a href="/reference/downloads/" class="md-nav__link">
         
   
   
@@ -1249,7 +1251,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/releases/" class="md-nav__link">
+      <a href="/reference/releases/" class="md-nav__link">
         
   
   
@@ -1276,7 +1278,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/security/" class="md-nav__link">
+      <a href="/reference/security/" class="md-nav__link">
         
   
   
@@ -1364,7 +1366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/development-setup/" class="md-nav__link">
+      <a href="/contributing/development-setup/" class="md-nav__link">
         
   
   
@@ -1391,7 +1393,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/development-guidelines/" class="md-nav__link">
+      <a href="/contributing/development-guidelines/" class="md-nav__link">
         
   
   
@@ -1418,7 +1420,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/releasing/" class="md-nav__link">
+      <a href="/contributing/releasing/" class="md-nav__link">
         
   
   
@@ -2848,7 +2850,7 @@ for up-to-date guidance on deploying extensions.</p>
 <h2 id="websocket-server">Websocket Server<a class="headerlink" href="#websocket-server" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Experimental</p>
-<p>The websocket server is <strong>experimental and pending security hardening</strong>. It is not yet well supported and may exhibit gaps, either in the operator (e.g. unvalidated path-based gateway/ingress routing) or upstream in the Node.js websocket image. It requires a custom Node.js image (below). Treat its spec and behavior as subject to change, and avoid enabling it in production until it is hardened. See the <a href="../../reference/security/#what-is-generally-out-of-scope">security reference</a> for details.</p>
+<p>The websocket server is <strong>experimental and pending security hardening</strong>. It is not yet well supported and may exhibit gaps, either in the operator (e.g. unvalidated path-based gateway/ingress routing) or upstream in the Node.js websocket image. It requires a custom Node.js image (below). Treat its spec and behavior as subject to change, and avoid enabling it in production until it is hardened. See the <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#what-is-generally-out-of-scope">security reference</a> for details.</p>
 </div>
 <p>Enable Superset's async event streaming by setting <code>websocketServer</code>. This deploys a <strong>Node.js</strong> application (not Python) that pushes real-time updates to dashboards via WebSocket connections.</p>
 <div class="admonition warning">
@@ -3415,6 +3417,8 @@ for up-to-date guidance on deploying extensions.</p>
     
     
       <script src="../../assets/javascripts/bundle.a2388154.min.js"></script>
+      
+        <script src="../../javascripts/version-switcher.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
