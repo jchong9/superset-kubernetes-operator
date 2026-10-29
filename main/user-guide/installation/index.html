@@ -1366,7 +1366,7 @@ under the License.
 -->
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
-<p>This guide covers installing the operator and deploying a Superset instance in production. For a quick local trial, see <a href="../../getting-started/">Getting Started</a>. For development setup, see <a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
+<p>This guide covers installing the operator and deploying a Superset instance in production. For a quick local trial, see <a href="../../getting-started/">Getting Started</a>. For development setup, see <a href="/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Kubernetes cluster (see <a href="#supported-kubernetes-versions">Supported versions</a>)</li>
@@ -1403,7 +1403,7 @@ which are enabled by default as beta from 1.25 and graduated to GA in 1.29. On c
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>--create-namespace<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span>--set<span class="w"> </span>image.pullPolicy<span class="o">=</span>Always
 </code></pre></div>
-<p>See <code>charts/superset-operator/values.yaml</code> for all available Helm values and <a href="https://apache.github.io/superset-kubernetes-operator/reference/downloads/">Downloads</a> for published images and tag conventions.</p>
+<p>See <code>charts/superset-operator/values.yaml</code> for all available Helm values and <a href="/superset-kubernetes-operator/reference/downloads/">Downloads</a> for published images and tag conventions.</p>
 <h3 id="extra-manifests">Extra manifests<a class="headerlink" href="#extra-manifests" title="Permanent link">&para;</a></h3>
 <p>The chart's <code>extraManifests</code> value renders additional Kubernetes manifests as part of the release. Each entry is passed through Helm's <a href="https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function"><code>tpl</code> function</a>, so template expressions like <code>{{ .Release.Namespace }}</code> resolve at install time. Use it for trusted, release-scoped companion resources owned by the operator release — a cert-manager <code>Certificate</code> backing <code>metrics.certSecretName</code>, a <code>NetworkPolicy</code> for the manager pod, or an <code>ExternalSecret</code>. Do not use it for shared cluster infrastructure such as Gateway API controllers, CRDs, or shared Gateways — those have their own lifecycle and should not be upgraded or garbage-collected with this release. See the <code>extraManifests</code> examples in <code>charts/superset-operator/values.yaml</code> for both entry forms (YAML objects and raw strings).</p>
 <h3 id="namespace-scoped-install">Namespace-scoped install<a class="headerlink" href="#namespace-scoped-install" title="Permanent link">&para;</a></h3>
@@ -1427,7 +1427,7 @@ which are enabled by default as beta from 1.25 and graduated to GA in 1.29. On c
 <li>Changing <code>watch.namespaces</code> requires a <code>helm upgrade</code> — the manager cache is built at startup, so the pod must restart to pick up a new list.</li>
 <li>Superset CRs created in namespaces outside <code>watch.namespaces</code> are not reconciled (no log, no status).</li>
 </ul>
-<p>See <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#install-scope">Install Scope</a> in the security reference for the trust-model context.</p>
+<p>See <a href="/superset-kubernetes-operator/reference/security/#install-scope">Install Scope</a> in the security reference for the trust-model context.</p>
 <h3 id="high-availability">High availability<a class="headerlink" href="#high-availability" title="Permanent link">&para;</a></h3>
 <p>Running more than one manager replica gives you failover, not horizontal scaling. Replicas are active/standby: only the replica holding the <a href="https://kubernetes.io/docs/concepts/architecture/leases/#leader-election">leader election Lease</a> reconciles, and the others wait to take over. Keep <code>leaderElection.enabled: true</code> whenever <code>replicas</code> is greater than 1; without it, every replica reconciles the same <code>Superset</code> resources and they race on Jobs, drains, and status.</p>
 <ul>
@@ -1545,7 +1545,7 @@ for details.</p>
 </code></pre></div>
 <p>The operator will create the CeleryWorker and CeleryBeat Deployments and their ConfigMaps automatically.</p>
 <h2 id="debugging-the-operator">Debugging the operator<a class="headerlink" href="#debugging-the-operator" title="Permanent link">&para;</a></h2>
-<p>If a Superset isn't reconciling as expected, raise the operator's log verbosity. The chart exposes a <code>logLevel</code> value mapped to the manager's <code>--zap-log-level</code> flag: <code>debug</code> (or <code>1</code>) adds V(1) per-reconcile progress logs, and <code>2</code> adds V(2) trace-level internals. See the <a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-guidelines/#logging">logging policy</a> for what each level emits.</p>
+<p>If a Superset isn't reconciling as expected, raise the operator's log verbosity. The chart exposes a <code>logLevel</code> value mapped to the manager's <code>--zap-log-level</code> flag: <code>debug</code> (or <code>1</code>) adds V(1) per-reconcile progress logs, and <code>2</code> adds V(2) trace-level internals. See the <a href="/superset-kubernetes-operator/contributing/development-guidelines/#logging">logging policy</a> for what each level emits.</p>
 <p>Set it at install/upgrade time:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>superset-operator<span class="w"> </span>&lt;chart&gt;<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>--namespace<span class="w"> </span>superset-operator-system<span class="w"> </span><span class="se">\</span>

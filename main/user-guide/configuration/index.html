@@ -2850,7 +2850,7 @@ for up-to-date guidance on deploying extensions.</p>
 <h2 id="websocket-server">Websocket Server<a class="headerlink" href="#websocket-server" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Experimental</p>
-<p>The websocket server is <strong>experimental and pending security hardening</strong>. It is not yet well supported and may exhibit gaps, either in the operator (e.g. unvalidated path-based gateway/ingress routing) or upstream in the Node.js websocket image. It requires a custom Node.js image (below). Treat its spec and behavior as subject to change, and avoid enabling it in production until it is hardened. See the <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#what-is-generally-out-of-scope">security reference</a> for details.</p>
+<p>The websocket server is <strong>experimental and pending security hardening</strong>. It is not yet well supported and may exhibit gaps, either in the operator (e.g. unvalidated path-based gateway/ingress routing) or upstream in the Node.js websocket image. It requires a custom Node.js image (below). Treat its spec and behavior as subject to change, and avoid enabling it in production until it is hardened. See the <a href="/superset-kubernetes-operator/reference/security/#what-is-generally-out-of-scope">security reference</a> for details.</p>
 </div>
 <p>Enable Superset's async event streaming by setting <code>websocketServer</code>. This deploys a <strong>Node.js</strong> application (not Python) that pushes real-time updates to dashboards via WebSocket connections.</p>
 <div class="admonition warning">

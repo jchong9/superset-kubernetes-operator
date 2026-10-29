@@ -1877,9 +1877,9 @@ under the License.
 
 <h1 id="development-guidelines">Development Guidelines<a class="headerlink" href="#development-guidelines" title="Permanent link">&para;</a></h1>
 <p>This guide covers the patterns, conventions, and testing philosophy that govern contributions to the operator. For environment setup, see
-<a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
+<a href="/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://apache.github.io/superset-kubernetes-operator/latest/architecture/overview/">Architecture</a> for the structural overview (CRD hierarchy, configuration model, config rendering) and <a href="https://apache.github.io/superset-kubernetes-operator/latest/architecture/internals/">Internals</a> for runtime behavior (reconciliation lifecycle, parent-owned resource reconciliation, status reporting). Key points:</p>
+<p>See <a href="/superset-kubernetes-operator/latest/architecture/overview/">Architecture</a> for the structural overview (CRD hierarchy, configuration model, config rendering) and <a href="/superset-kubernetes-operator/latest/architecture/internals/">Internals</a> for runtime behavior (reconciliation lifecycle, parent-owned resource reconciliation, status reporting). Key points:</p>
 <ul>
 <li><strong>Single public CRD</strong>: <code>Superset</code> resolves shared spec (top-level + per-component) into parent-owned Kubernetes resources</li>
 <li><strong>6 deployment components + lifecycle tasks</strong>: web server, Celery worker, Celery beat, Flower, websocket, MCP, and task Jobs for seed/migrate/rotate/init</li>
@@ -1902,7 +1902,7 @@ under the License.
 <li><strong>Don't test non-actions.</strong> A test should pin a behavior the code actively produces, not assert the absence of behavior the code never had (or no longer has). When you delete a feature, delete its tests — don't invert them into "X no longer happens" assertions. The positive tests for the surviving behavior already cover it: e.g. after removing downgrade blocking, a "downgrade proceeds" test is redundant because the general "an image change proceeds and re-runs migrate" test already exercises that path. (Mirrors the documentation rule: don't describe what the default already precludes.)</li>
 </ul>
 <h3 id="security-and-the-threat-model">Security and the threat model<a class="headerlink" href="#security-and-the-threat-model" title="Permanent link">&para;</a></h3>
-<p>The <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/">security reference</a> is the source of truth for the operator's security guarantees. Keep it and the tests that guard it in lockstep:</p>
+<p>The <a href="/superset-kubernetes-operator/reference/security/">security reference</a> is the source of truth for the operator's security guarantees. Keep it and the tests that guard it in lockstep:</p>
 <ul>
 <li><strong>When you change the threat model</strong>, update the corresponding security regression tests in the same PR (e.g. the ConfigMap no-leak guard, the RBAC scope guard, and the CEL secret-gating specs) so the guarantees and their guards never drift apart.</li>
 <li><strong>When you add a feature</strong>, confirm the threat model still holds — update it if the change introduces a new trust boundary, secret, or risk surface — and add tests covering that new security surface.</li>
@@ -2111,14 +2111,14 @@ under the License.
 <li><strong>Don't fetch resources by name for cleanup</strong> — use <code>deleteByLabels</code> with parent/component labels to discover and clean up. Name-based <code>CreateOrUpdate</code> and status reads are fine — those address resources whose names the operator controls.</li>
 <li><strong>Don't hardcode commands/ports</strong> — use <code>DeploymentConfig</code> defaults</li>
 <li><strong>Don't duplicate controller logic</strong> — use <code>component_reconciler.go</code> helpers</li>
-<li><strong>Don't copy derived facts between docs</strong> — values defined in code or in one canonical doc (e.g. the per-component routing paths in <a href="https://apache.github.io/superset-kubernetes-operator/latest/user-guide/networking-and-monitoring/"><code>networking-and-monitoring.md</code></a>) should be stated once and cross-linked from elsewhere, not re-listed on other pages where they silently go stale. Same spirit as the Automation Principle: one source of truth.</li>
+<li><strong>Don't copy derived facts between docs</strong> — values defined in code or in one canonical doc (e.g. the per-component routing paths in <a href="/superset-kubernetes-operator/latest/user-guide/networking-and-monitoring/"><code>networking-and-monitoring.md</code></a>) should be stated once and cross-linked from elsewhere, not re-listed on other pages where they silently go stale. Same spirit as the Automation Principle: one source of truth.</li>
 <li><strong>Don't echo upstream defaults in Helm values or docs</strong> — when a Helm value passes through to a Kubernetes field, leave it unset (<code>~</code>) so the platform default applies, and don't restate the current default value in comments, <code>values.yaml</code>, or release notes. Defaults can change upstream, and repeating them creates a second source of truth that silently goes stale.</li>
 <li><strong>Don't add fields without doc comments</strong> — they become CRD descriptions</li>
 <li><strong>Don't use <code>bool</code> with <code>omitempty</code></strong> — use <code>*bool</code> to distinguish false from unset</li>
 <li><strong>Don't write integration tests for unit-testable logic</strong> — use fake client</li>
 <li><strong>Don't put secret values in ConfigMaps</strong> — in prod mode, secrets are mounted via env vars from Kubernetes Secrets</li>
 <li><strong>Don't use admission webhooks for validation</strong> — use <a href="https://kubernetes.io/docs/reference/using-api/cel/">CEL</a> (<code>x-kubernetes-validations</code>) on CRD types instead. Webhooks add operational complexity (cert-manager dependency, TLS setup) and are not installed by default. All validation rules should be expressed as CEL where feasible.</li>
-<li><strong>Cross-reference security docs</strong> — any change that affects trust boundaries, secret handling, RBAC, CRD validation, or the operator's attack surface must be reflected in <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/"><code>docs/reference/security.md</code></a>. Review the threat model, design decisions, and in-scope/out-of-scope sections to ensure they stay accurate.</li>
+<li><strong>Cross-reference security docs</strong> — any change that affects trust boundaries, secret handling, RBAC, CRD validation, or the operator's attack surface must be reflected in <a href="/superset-kubernetes-operator/reference/security/"><code>docs/reference/security.md</code></a>. Review the threat model, design decisions, and in-scope/out-of-scope sections to ensure they stay accurate.</li>
 </ul>
 <h2 id="how-to-add-a-new-field">How to Add a New Field<a class="headerlink" href="#how-to-add-a-new-field" title="Permanent link">&para;</a></h2>
 <p>New Deployment/Pod/Container fields go into the template hierarchy:</p>
@@ -2390,7 +2390,7 @@ and <code>statusAccessor</code> functions.</li>
 <p>The PR template (<code>PULL_REQUEST_TEMPLATE.md</code>) pre-fills these sections.</p>
 <h3 id="changelog-entry">Changelog entry<a class="headerlink" href="#changelog-entry" title="Permanent link">&para;</a></h3>
 <p>Add a bullet under <code>## Unreleased</code> in
-<a href="https://apache.github.io/superset-kubernetes-operator/reference/releases/"><code>docs/reference/releases.md</code></a>
+<a href="/superset-kubernetes-operator/reference/releases/"><code>docs/reference/releases.md</code></a>
 for noteworthy changes — new features, new CRD fields, behavior changes, breaking changes, deprecations, and critical bug fixes. Skip the entry for routine work that a user wouldn't care about: dependency bumps, CI tweaks, internal refactors, test-only changes, and documentation-only updates.</p>
 <p>Group entries under <code>Added</code>, <code>Changed</code>, <code>Deprecated</code>, <code>Removed</code>, <code>Fixed</code>, or <code>Security</code> (per <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>); create the subheading on first use. These are the only subheadings — Keep a Changelog has no dedicated "Breaking" section. Lead each bullet with the user-facing effect, not the implementation.</p>
 <p>Mark a breaking change with a bold <code>**Breaking:**</code> prefix under the most fitting category (usually <code>Changed</code> or <code>Removed</code>) and state the required migration in the same bullet. The <code>Added</code> section and the <code>**Breaking:**</code> markers are what operators scan first when deciding whether — and how carefully — to upgrade, so keep both accurate:</p>
@@ -2407,7 +2407,7 @@ for noteworthy changes — new features, new CRD fields, behavior changes, break
 <a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="k">-</span><span class="w"> </span>Lifecycle <span class="sb">`migrate`</span> task no longer retries indefinitely when the metastore
 <a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>  rejects credentials; the parent surfaces an <span class="sb">`AuthenticationFailed`</span> reason.
 </code></pre></div>
-<p>The release manager does a final review pass over <code>## Unreleased</code> before tagging — see <a href="https://apache.github.io/superset-kubernetes-operator/contributing/releasing/#reviewing-the-changelog">Releasing</a> — so it's fine to err on the side of including an entry; missing or duplicate ones can be cleaned up there.</p>
+<p>The release manager does a final review pass over <code>## Unreleased</code> before tagging — see <a href="/superset-kubernetes-operator/contributing/releasing/#reviewing-the-changelog">Releasing</a> — so it's fine to err on the side of including an entry; missing or duplicate ones can be cleaned up there.</p>
 <h3 id="code-coverage">Code coverage<a class="headerlink" href="#code-coverage" title="Permanent link">&para;</a></h3>
 <p>CI uploads test coverage to <a href="https://codecov.io">Codecov</a> on every PR. The Codecov bot posts a comment showing:</p>
 <ul>
