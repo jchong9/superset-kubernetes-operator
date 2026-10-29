@@ -1324,7 +1324,7 @@ under the License.
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
 <p>This guide covers installing the operator and deploying a Superset instance in
 production. For a quick local trial, see <a href="../../getting-started/">Getting Started</a>.
-For development setup, see <a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
+For development setup, see <a href="/superset-kubernetes-operator/contributing/development-setup/">Development Setup</a>.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Kubernetes cluster (see <a href="#supported-kubernetes-versions">Supported versions</a>)</li>
@@ -1372,7 +1372,7 @@ set <code>image.pullPolicy=Always</code> to ensure you always get the latest ima
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span>--set<span class="w"> </span>image.pullPolicy<span class="o">=</span>Always
 </code></pre></div>
 <p>See <code>charts/superset-operator/values.yaml</code> for all available Helm values and
-<a href="https://apache.github.io/superset-kubernetes-operator/reference/downloads/">Downloads</a> for published images and tag conventions.</p>
+<a href="/superset-kubernetes-operator/reference/downloads/">Downloads</a> for published images and tag conventions.</p>
 <h3 id="namespace-scoped-install">Namespace-scoped install<a class="headerlink" href="#namespace-scoped-install" title="Permanent link">&para;</a></h3>
 <p>By default the operator installs cluster-scoped (watches all namespaces and
 binds a <code>ClusterRole</code>). For restricted clusters that forbid cluster-scoped
@@ -1410,7 +1410,7 @@ extend the component.</p>
 <li>Superset CRs created in namespaces outside <code>watch.namespaces</code> are not
   reconciled (no log, no status).</li>
 </ul>
-<p>See <a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#install-scope">Install Scope</a> in the security
+<p>See <a href="/superset-kubernetes-operator/reference/security/#install-scope">Install Scope</a> in the security
 reference for the trust-model context.</p>
 <h2 id="2-create-secrets">2. Create secrets<a class="headerlink" href="#2-create-secrets" title="Permanent link">&para;</a></h2>
 <p>Superset requires a secret key for session signing. In production, mount it
@@ -1524,7 +1524,7 @@ ConfigMaps automatically.</p>
 The chart exposes a <code>logLevel</code> value mapped to the manager's <code>--zap-log-level</code>
 flag: <code>debug</code> (or <code>1</code>) adds V(1) per-reconcile progress logs, and <code>2</code> adds V(2)
 trace-level internals. See the
-<a href="https://apache.github.io/superset-kubernetes-operator/contributing/development-guidelines/#logging">logging policy</a> for what each
+<a href="/superset-kubernetes-operator/contributing/development-guidelines/#logging">logging policy</a> for what each
 level emits.</p>
 <p>Set it at install/upgrade time:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>superset-operator<span class="w"> </span>&lt;chart&gt;<span class="w"> </span><span class="se">\</span>

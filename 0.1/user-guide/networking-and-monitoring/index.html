@@ -1421,7 +1421,7 @@ and the Helm chart. It's fine for a trusted cluster but not for
 zero-trust environments. Authentication and authorization are always enforced
 via bearer tokens (<code>TokenReview</code>/<code>SubjectAccessReview</code>) regardless of TLS
 setup — see
-<a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security
+<a href="/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security
 reference for the trust-model context.</p>
 <h3 id="enable-via-helm">Enable via Helm<a class="headerlink" href="#enable-via-helm" title="Permanent link">&para;</a></h3>
 <p>The chart ships a ServiceMonitor template, off by default. The minimal
@@ -1555,7 +1555,7 @@ selectors.</p>
 unrestricted so workloads can reach the metastore database, Valkey, SMTP
 servers, and other user-configured dependencies. For the rationale and
 hardening path, see
-<a href="https://apache.github.io/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security
+<a href="/superset-kubernetes-operator/reference/security/#design-decisions">Design Decisions</a> in the security
 reference.</p>
 
 
