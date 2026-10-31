@@ -1,0 +1,15 @@
+[
+  {
+    "version": "0.3",
+    "title": "0.3",
+    "aliases": [
+      "latest"
+    ],
+    "release": "0.3.1"
+  },
+  {
+    "version": "main",
+    "title": "main (unreleased)",
+    "aliases": []
+  }
+]
