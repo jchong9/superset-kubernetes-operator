@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.71">
+      <meta name="generator" content="zensical-0.0.72">
     
     
       
@@ -33,7 +33,7 @@
       
         
       
-      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.e442bf79.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/modern/main.4ab2de0c.min.css">
       
         
           
@@ -58,8 +58,6 @@
     
     
       <link rel="stylesheet" href="../../stylesheets/extra.css">
-    
-      <link rel="stylesheet" href="../../stylesheets/version-banner.css">
     
     <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
@@ -105,9 +103,10 @@
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
 
     </a>
-    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+    <label class="md-header__button md-icon" for="__drawer">
       
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+      <span class="md-visually-hidden">Navigation</span>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -159,9 +158,10 @@
     
       
       
-        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+        <label class="md-header__button md-icon" for="__search">
           
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          <span class="md-visually-hidden">Search</span>
         </label>
         <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
   <button type="button" class="md-search__button">
@@ -264,7 +264,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/getting-started/" class="md-nav__link">
+      <a href="../../getting-started/" class="md-nav__link">
         
   
   
@@ -343,7 +343,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/user-guide/installation/" class="md-nav__link">
+      <a href="../../user-guide/installation/" class="md-nav__link">
         
   
   
@@ -370,7 +370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/user-guide/configuration/" class="md-nav__link">
+      <a href="../../user-guide/configuration/" class="md-nav__link">
         
   
   
@@ -397,7 +397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/user-guide/lifecycle/" class="md-nav__link">
+      <a href="../../user-guide/lifecycle/" class="md-nav__link">
         
   
   
@@ -424,7 +424,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/user-guide/networking-and-monitoring/" class="md-nav__link">
+      <a href="../../user-guide/networking-and-monitoring/" class="md-nav__link">
         
   
   
@@ -451,7 +451,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/user-guide/migration/" class="md-nav__link">
+      <a href="../../user-guide/migration/" class="md-nav__link">
         
   
   
@@ -539,7 +539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/architecture/overview/" class="md-nav__link">
+      <a href="../../architecture/overview/" class="md-nav__link">
         
   
   
@@ -566,7 +566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/architecture/internals/" class="md-nav__link">
+      <a href="../../architecture/internals/" class="md-nav__link">
         
   
   
@@ -654,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/latest/reference/api-reference/" class="md-nav__link">
+      <a href="../../reference/api-reference/" class="md-nav__link">
         
   
   
@@ -1469,7 +1469,7 @@ under the License.
 </tr>
 </tbody>
 </table>
-<p>See <a href="/superset-kubernetes-operator/reference/downloads/">Downloads</a> for full details on published images and registries.</p>
+<p>See <a href="../../reference/downloads/">Downloads</a> for full details on published images and registries.</p>
 <p>Before creating the first RC for a minor release, run or verify:</p>
 <ul>
 <li><code>make codegen</code> leaves no diff</li>
@@ -1483,7 +1483,7 @@ under the License.
 <li>The release workflow is using pinned/checksum-verified tool downloads</li>
 </ul>
 <h2 id="reviewing-the-changelog">Reviewing the Changelog<a class="headerlink" href="#reviewing-the-changelog" title="Permanent link">&para;</a></h2>
-<p>Contributors add bullets to <code>## Unreleased</code> in <a href="/superset-kubernetes-operator/reference/releases/"><code>docs/reference/releases.md</code></a> as PRs land (see the <a href="/superset-kubernetes-operator/contributing/development-guidelines/#changelog-entry">changelog convention</a>). Before tagging the RC, the release manager does one review pass to make sure the section accurately reflects the release:</p>
+<p>Contributors add bullets to <code>## Unreleased</code> in <a href="../../reference/releases/"><code>docs/reference/releases.md</code></a> as PRs land (see the <a href="../development-guidelines/#changelog-entry">changelog convention</a>). Before tagging the RC, the release manager does one review pass to make sure the section accurately reflects the release:</p>
 <ol>
 <li>Skim <code>git log v&lt;previous&gt;..HEAD</code> for noteworthy changes that nobody added an entry for, and add them. Skim for changes that were added but aren't actually noteworthy (typo fixes, internal refactors that snuck in), and drop them.</li>
 <li>Merge bullets that describe the same user-visible change — separate PRs often touch on a single feature.</li>
@@ -1685,9 +1685,7 @@ under the License.
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["content.code.copy","navigation.sections","navigation.expand","navigation.top","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a2388154.min.js"></script>
-      
-        <script src="../../javascripts/version-switcher.js"></script>
+      <script src="../../assets/javascripts/bundle.10ee5ab6.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
       
