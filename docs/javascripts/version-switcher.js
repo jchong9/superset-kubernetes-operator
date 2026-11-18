@@ -31,6 +31,13 @@
   const BANNER_ID = "docs-version-banner";
   // Namespaced because GitHub Pages projects share one origin.
   const VERSION_STORAGE_PREFIX = "superset-kubernetes-operator-docs-version:";
+  let storageWarningShown = false;
+
+  function warnStorageError(error) {
+    if (storageWarningShown) return;
+    storageWarningShown = true;
+    console.warn("version-switcher: could not access the saved documentation version", error);
+  }
 
   // ---- paths ----
 
@@ -87,7 +94,7 @@
       const preferred = window.sessionStorage.getItem(`${VERSION_STORAGE_PREFIX}${root}`);
       return versions.find((entry) => entry.version === preferred);
     } catch (error) {
-      console.warn("version-switcher: could not read the saved documentation version", error);
+      warnStorageError(error);
       return undefined;
     }
   }
@@ -96,7 +103,7 @@
     try {
       window.sessionStorage.setItem(`${VERSION_STORAGE_PREFIX}${root}`, version);
     } catch (error) {
-      console.warn("version-switcher: could not save the selected documentation version", error);
+      warnStorageError(error);
     }
   }
 
@@ -105,22 +112,44 @@
     link.setAttribute("href", `${pathname}${link.search}${link.hash}`);
   }
 
-  // Shared pages link to /latest/...; point them at the reader's version instead.
+  /** Return the selected-version path for a versioned link, or null when it is unrelated. */
+  function retargetedPath(root, version, link, { aliasOnly = false } = {}) {
+    if (link.origin !== window.location.origin || !link.pathname.startsWith(root)) return null;
+    const path = link.pathname.slice(root.length);
+    const first = pathParts(path)[0];
+    if (!first || !VERSION_SEGMENT.test(first) || (aliasOnly && first !== LATEST)) return null;
+    return `${root}${version}/${path.slice(first.length + 1)}`;
+  }
+
   function rewriteRootVersionLinks(root, version) {
     document.querySelectorAll("a[href]").forEach((link) => {
-      if (
-        link.origin !== window.location.origin ||
-        link.hasAttribute("data-version-link") ||
-        link.closest(`.${SWITCHER_CLASS}`)
-      ) {
-        return;
-      }
-      const path = link.pathname.slice(root.length);
-      const firstSegment = pathParts(path)[0];
-      if (firstSegment && VERSION_SEGMENT.test(firstSegment)) {
-        setLinkPath(link, `${root}${version}/${path.slice(firstSegment.length + 1)}`);
-      }
+      if (link.hasAttribute("data-version-link") || link.closest(`.${SWITCHER_CLASS}`)) return;
+      const pathname = retargetedPath(root, version, link, { aliasOnly: true });
+      if (pathname !== null) setLinkPath(link, pathname);
     });
+  }
+
+  // Zensical renders search results in an open Shadow DOM, so use composed events
+  // instead of document selectors or mutation observers.
+  let searchTarget = null;
+
+  function searchResultLink(event) {
+    const path = event.composedPath();
+    const inSearchResults = path.some(
+      (node) => node instanceof Element && node.getAttribute("role") === "listbox"
+    );
+    return inSearchResults
+      ? path.find((node) => node instanceof HTMLAnchorElement && node.getAttribute("role") === "option")
+      : null;
+  }
+
+  function retargetSearchResult(event) {
+    if (!searchTarget) return null;
+    const link = searchResultLink(event);
+    if (!link) return null;
+    const pathname = retargetedPath(searchTarget.root, searchTarget.version, link);
+    if (pathname !== null) setLinkPath(link, pathname);
+    return link;
   }
 
   function normalizeVersions(raw) {
@@ -152,6 +181,9 @@
       });
   }
 
+  // The manifest is shared by navigation and search routing.
+  const versionsPromise = loadVersions(resolveSiteRoot());
+
   // ---- navigation ----
 
   // The target version may not have this page.
@@ -174,7 +206,6 @@
       savePreferredVersion(root, link.dataset.versionPreference);
       // A shared page has no versioned twin: stay here and retarget its links.
       if (!detectVersionSegment(root)) {
-        rewriteRootVersionLinks(root, link.dataset.versionPreference);
         render(await versionsPromise);
         return;
       }
@@ -184,6 +215,32 @@
       : link.dataset.fallback;
     window.location.assign(destination);
   }
+
+  // ---- search results ----
+
+  for (const eventName of ["pointerover", "focusin"]) {
+    document.addEventListener(eventName, retargetSearchResult, true);
+  }
+
+  document.addEventListener(
+    "click",
+    async (event) => {
+      if (!searchTarget) return;
+      const link = searchResultLink(event);
+      const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+      if (!link || event.defaultPrevented || event.button !== 0 || modified) return;
+
+      const { root, version } = searchTarget;
+      const pathname = retargetedPath(root, version, link);
+      if (pathname === null) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setLinkPath(link, pathname);
+      const destination = (await pageExists(link.href)) ? link.href : `${root}${version}/`;
+      window.location.assign(destination);
+    },
+    true
+  );
 
   function makeVersionLink(root, entryOrSegment, currentSegment) {
     const segment = typeof entryOrSegment === "string" ? entryOrSegment : segmentFor(entryOrSegment);
@@ -285,7 +342,11 @@
     const latest = versions.find(isLatest);
     const preferred = getPreferredVersion(root, versions);
     if (!segment) {
-      rewriteRootVersionLinks(root, preferred?.version || latest?.version || "main");
+      const version = preferred?.version || latest?.version || "main";
+      searchTarget = { root, version };
+      rewriteRootVersionLinks(root, version);
+    } else {
+      searchTarget = null;
     }
     const ctx = {
       versions,
@@ -319,6 +380,5 @@
     }).observe(document.body, { childList: true, subtree: true });
   }
 
-  const versionsPromise = loadVersions(resolveSiteRoot());
   onPageReady(() => versionsPromise.then(render));
 })();

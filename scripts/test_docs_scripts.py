@@ -127,12 +127,204 @@ class DocsVersionsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.make_site(root, landing=True)
+            (root / "search-unversioned.json").write_text(json.dumps({"config": {}, "items": []}))
+            (root / "0.3/search-versioned.json").write_text(json.dumps({"config": {}, "items": []}))
             args = ["finalize", "--publish-dir", str(root), "--target", "0.3", "--release", "0.3.0"]
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(dv.main(args), 0)
             self.assertIn('new URL("getting-started/", location.href)', (root / "0.3/index.html").read_text())
             self.assertEqual(dv.latest_version(dv.load_manifest(root)), "0.3")
             self.assertTrue((root / "latest/index.html").is_file())
+
+    def test_finalize_combines_shared_and_versioned_search_indexes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, landing=True)
+            root_index = {
+                "config": {"lang": "en"},
+                "items": [{"location": "reference/security/", "title": "Security", "text": "shared"}],
+            }
+            version_index = {
+                "config": {"lang": "en"},
+                "items": [{"location": "user-guide/installation/", "title": "Install", "text": "versioned"}],
+            }
+            (root / "search-unversioned.json").write_text(json.dumps(root_index))
+            (root / "0.3/search-versioned.json").write_text(json.dumps(version_index))
+
+            finalize_version = [
+                "finalize", "--publish-dir", str(root), "--target", "0.3", "--release", "0.3.0"
+            ]
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(dv.main(finalize_version), 0)
+
+            version_items = json.loads((root / "0.3/search.json").read_text())["items"]
+            self.assertEqual(
+                [item["location"] for item in version_items],
+                ["../reference/security/", "user-guide/installation/"],
+            )
+            root_items = json.loads((root / "search.json").read_text())["items"]
+            self.assertEqual(
+                [item["location"] for item in root_items],
+                ["reference/security/", "0.3/user-guide/installation/"],
+            )
+
+            updated_root_index = {
+                "config": {"lang": "en"},
+                "items": [{"location": "contributing/setup/", "title": "Setup", "text": "updated shared"}],
+            }
+            (root / "search-unversioned.json").write_text(json.dumps(updated_root_index))
+            finalize_root = ["finalize", "--publish-dir", str(root), "--target", "root"]
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(dv.main(finalize_root), 0)
+
+            root_items = json.loads((root / "search.json").read_text())["items"]
+            self.assertEqual(
+                [item["location"] for item in root_items],
+                ["contributing/setup/", "0.3/user-guide/installation/"],
+            )
+            version_items = json.loads((root / "0.3/search.json").read_text())["items"]
+            self.assertEqual(version_items[0]["location"], "../contributing/setup/")
+            stable_root_search = (root / "search.json").read_bytes()
+            stable_version_search = (root / "0.3/search.json").read_bytes()
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(dv.main(finalize_root), 0)
+            self.assertEqual((root / "search.json").read_bytes(), stable_root_search)
+            self.assertEqual((root / "0.3/search.json").read_bytes(), stable_version_search)
+
+    def test_finalize_combines_search_without_latest_version_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, "main", landing=True)
+            entries = dv.build_manifest([], "0.4", "0.4.0")
+            dv.write_manifest(root, entries)
+            (root / "search-unversioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "shared/", "title": "Shared", "text": ""}]})
+            )
+            (root / "main/search-versioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "guide/", "title": "Guide", "text": ""}]})
+            )
+
+            args = ["finalize", "--publish-dir", str(root), "--target", "main"]
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(dv.main(args), 0)
+
+            version_items = json.loads((root / "main/search.json").read_text())["items"]
+            self.assertEqual([item["location"] for item in version_items], ["../shared/", "guide/"])
+            self.assertFalse((root / "0.4").exists())
+
+    def test_search_preparation_requires_latest_source_for_release(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            entries = dv.build_manifest([], "0.4", "0.4.0")
+            (root / "search-unversioned.json").write_text(json.dumps({"config": {}, "items": []}))
+            with self.assertRaisesRegex(dv.DocsVersionError, "root search will not include 0.4 pages"):
+                dv.prepare_combined_search_indexes(root, entries, "0.4", require_root=True)
+
+    def test_finalize_warns_when_latest_search_source_is_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            entries = dv.build_manifest([], "0.4", "0.4.0")
+            (root / "search-unversioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "shared/", "title": "Shared", "text": ""}]})
+            )
+            stderr = io.StringIO()
+
+            with contextlib.redirect_stderr(stderr):
+                outputs = dv.prepare_combined_search_indexes(root, entries, "0.4")
+
+            self.assertIn("0.4/search-versioned.json is missing", stderr.getvalue())
+            self.assertEqual(outputs[root / "search.json"]["items"][0]["location"], "shared/")
+
+    def test_finalize_warns_without_root_search_source_and_preserves_indexes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, "main", landing=True)
+            (root / "main/search-versioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "guide/", "title": "Guide", "text": ""}]})
+            )
+            original_index = b"existing search index"
+            (root / "main/search.json").write_bytes(original_index)
+            stderr = io.StringIO()
+            args = ["finalize", "--publish-dir", str(root), "--target", "main"]
+
+            with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(dv.main(args), 0)
+
+            self.assertIn("search-unversioned.json is missing", stderr.getvalue())
+            self.assertEqual((root / "main/search.json").read_bytes(), original_index)
+
+    def test_release_finalize_requires_root_search_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, landing=True)
+            (root / "0.3/search-versioned.json").write_text(
+                json.dumps({"config": {}, "items": []})
+            )
+            stderr = io.StringIO()
+            args = ["finalize", "--publish-dir", str(root), "--target", "0.3", "--release", "0.3.0"]
+
+            with contextlib.redirect_stderr(stderr):
+                self.assertEqual(dv.main(args), 2)
+
+            self.assertIn("for a release publish", stderr.getvalue())
+            self.assertFalse((root / dv.MANIFEST).exists())
+            self.assertEqual((root / "0.3/index.html").read_text(), "<html></html>")
+
+    def test_finalize_validates_search_indexes_before_writing_site_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, landing=True)
+            (root / "search-unversioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "shared/", "title": "Shared", "text": ""}]})
+            )
+            (root / "0.3/search-versioned.json").write_text("{")
+            stderr = io.StringIO()
+            args = ["finalize", "--publish-dir", str(root), "--target", "0.3", "--release", "0.3.0"]
+
+            with contextlib.redirect_stderr(stderr):
+                self.assertEqual(dv.main(args), 2)
+
+            self.assertIn("could not read search index", stderr.getvalue())
+            self.assertFalse((root / dv.MANIFEST).exists())
+            self.assertEqual((root / "0.3/index.html").read_text(), "<html></html>")
+            self.assertFalse((root / "latest").exists())
+
+    def test_finalize_rejects_mismatched_search_configs_before_writing_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, landing=True)
+            (root / "search-unversioned.json").write_text(
+                json.dumps({"config": {"lang": "en"}, "items": []})
+            )
+            (root / "0.3/search-versioned.json").write_text(
+                json.dumps({"config": {"lang": "fr"}, "items": []})
+            )
+            stderr = io.StringIO()
+            args = ["finalize", "--publish-dir", str(root), "--target", "0.3", "--release", "0.3.0"]
+
+            with contextlib.redirect_stderr(stderr):
+                self.assertEqual(dv.main(args), 2)
+
+            self.assertIn("search config", stderr.getvalue())
+            self.assertFalse((root / dv.MANIFEST).exists())
+
+    def test_finalize_search_supports_main_as_latest(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, "main", landing=True)
+            (root / "search-unversioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "shared/", "title": "Shared", "text": ""}]})
+            )
+            (root / "main/search-versioned.json").write_text(
+                json.dumps({"config": {}, "items": [{"location": "guide/", "title": "Guide", "text": ""}]})
+            )
+            args = ["finalize", "--publish-dir", str(root), "--target", "main"]
+
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(dv.main(args), 0)
+
+            root_items = json.loads((root / "search.json").read_text())["items"]
+            self.assertEqual([item["location"] for item in root_items], ["shared/", "main/guide/"])
 
     def test_finalize_refuses_a_version_without_the_landing_page(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -144,6 +336,22 @@ class DocsVersionsTest(unittest.TestCase):
                 self.assertEqual(dv.main(args), 2)
             self.assertIn("getting-started", stderr.getvalue())
             self.assertFalse((root / dv.MANIFEST).exists())
+
+    def test_load_manifest_wraps_filesystem_errors(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / dv.MANIFEST).mkdir()
+
+            with self.assertRaisesRegex(dv.DocsVersionError, "not valid JSON"):
+                dv.load_manifest(root)
+
+    def test_load_manifest_rejects_invalid_version_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / dv.MANIFEST).write_text(json.dumps([{"version": "../outside"}]))
+
+            with self.assertRaisesRegex(dv.DocsVersionError, "invalid version"):
+                dv.load_manifest(root)
 
     def test_load_manifest_rejects_malformed_entries(self):
         with tempfile.TemporaryDirectory() as directory:

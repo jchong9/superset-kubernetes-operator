@@ -253,7 +253,7 @@ make docs-build-ci
 
 The local CI assembly already includes the `main` docs slice. To check how the current docs render under a release-style minor path, run `make docs-build-versioned DOCS_VERSION=0.3`. Add `DOCS_SERVE=true` to serve it locally. This uses current docs content; it does not fetch historical docs for that release.
 
-Docs CI uses two Zensical configs: `zensical-unversioned.toml` builds shared project pages at the site root, while `zensical-versioned.toml` builds version-sensitive docs under `/main/` or a release path. Add new pages to the appropriate navigation. Links to shared and versioned pages include `/superset-kubernetes-operator/`, the repository's GitHub Pages project path.
+Docs CI uses two Zensical configs: `zensical-unversioned.toml` builds shared project pages at the site root, while `zensical-versioned.toml` builds version-sensitive docs under `/main/` or a release path. The assembled search indexes include shared pages and versioned pages, so search results work across both sections. Add new pages to the appropriate navigation. Links to shared and versioned pages include `/superset-kubernetes-operator/`, the repository's GitHub Pages project path.
 
 ### Diagrams
 

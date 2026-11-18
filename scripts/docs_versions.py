@@ -59,6 +59,7 @@ import posixpath
 import re
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 from prepare_docs_links import SHARED_PAGES, SITE_PATH_PREFIX
@@ -69,6 +70,9 @@ LATEST = "latest"
 MAIN_TITLE = "main (unreleased)"
 MANIFEST = "versions.json"
 LANDING_PAGE = "getting-started"
+SEARCH_INDEX = "search.json"
+ROOT_SEARCH_SOURCE = "search-unversioned.json"
+VERSION_SEARCH_SOURCE = "search-versioned.json"
 LEGACY_REDIRECT_MARKER = "<!-- superset-operator-generated-legacy-redirect -->"
 
 MINOR_RE = re.compile(r"^[0-9]+\.[0-9]+$")
@@ -105,13 +109,16 @@ def load_manifest(publish_dir: Path) -> list[dict]:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         return []
-    except json.JSONDecodeError as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise DocsVersionError(f"{path} is not valid JSON: {exc}") from exc
     if not isinstance(data, list):
         raise DocsVersionError(f"{path} must contain a JSON array")
     for index, entry in enumerate(data):
         if not isinstance(entry, dict) or not isinstance(entry.get("version"), str):
             raise DocsVersionError(f"{path} entry {index} must be an object with a string 'version'")
+        version = entry["version"]
+        if version != MAIN and not MINOR_RE.fullmatch(version):
+            raise DocsVersionError(f"{path} entry {index} has invalid version {version!r}")
     return data
 
 
@@ -145,8 +152,32 @@ def build_manifest(entries: list[dict], target: str, release: str | None = None)
     return [by_version[v] for v in minors] + [by_version[MAIN]]
 
 
+def write_text_atomic(path: Path, content: str) -> None:
+    """Atomically replace one file, preserving its mode when it already exists."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    mode = path.stat().st_mode & 0o777 if path.exists() else 0o644
+    temporary_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as temporary_file:
+            temporary_path = Path(temporary_file.name)
+            temporary_file.write(content)
+        temporary_path.chmod(mode)
+        temporary_path.replace(path)
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+
+
 def write_manifest(publish_dir: Path, entries: list[dict]) -> None:
-    (publish_dir / MANIFEST).write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
+    content = json.dumps(entries, indent=2) + "\n"
+    write_text_atomic(publish_dir / MANIFEST, content)
 
 
 def latest_version(entries: list[dict]) -> str | None:
@@ -179,8 +210,9 @@ def write_version_landing(publish_dir: Path, version: str) -> None:
     """Versioned builds have no Home page, so the version root redirects to LANDING_PAGE."""
     version_root = publish_dir / version
     version_root.mkdir(parents=True, exist_ok=True)
-    (version_root / "index.html").write_text(
-        redirect_page(f"{LANDING_PAGE}/", f"the {version} documentation"), encoding="utf-8"
+    write_text_atomic(
+        version_root / "index.html",
+        redirect_page(f"{LANDING_PAGE}/", f"the {version} documentation"),
     )
 
 
@@ -250,6 +282,93 @@ def is_legacy_redirect(path: Path) -> bool:
     return LEGACY_REDIRECT_MARKER in content or legacy_target in content
 
 
+def _search_source(site_root: Path, source_name: str) -> Path | None:
+    """Return the preserved source index created by publish-docs.sh."""
+    source = site_root / source_name
+    return source if source.is_file() else None
+
+
+def _read_search_index(path: Path) -> dict:
+    try:
+        index = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise DocsVersionError(f"could not read search index {path}: {exc}") from exc
+
+    if not isinstance(index, dict) or not isinstance(index.get("items"), list):
+        raise DocsVersionError(f"search index {path} must be an object with an items array")
+    return index
+
+
+def _search_items(index: dict, location_prefix: str = "") -> list[dict]:
+    """Copy items while making locations relative to the consuming site's root."""
+    items = []
+    for position, item in enumerate(index["items"]):
+        if not isinstance(item, dict):
+            raise DocsVersionError(f"search index item {position} must be an object")
+        location = item.get("location")
+        if not isinstance(location, str):
+            raise DocsVersionError(f"search index item {position} location must be a string")
+        items.append({**item, "location": f"{location_prefix}{location.lstrip('/')}"})
+    return items
+
+
+def prepare_combined_search_indexes(
+    publish_dir: Path, entries: list[dict], latest: str | None, require_root: bool = False
+) -> dict[Path, dict]:
+    """Read and validate source indexes, then prepare outputs without changing the site."""
+    root_source = _search_source(publish_dir, ROOT_SEARCH_SOURCE)
+    if root_source is None:
+        message = f"{ROOT_SEARCH_SOURCE} is missing; search indexes were not combined"
+        if require_root:
+            raise DocsVersionError(f"{message} for a release publish")
+        print(f"warning: {message}", file=sys.stderr)
+        return {}
+
+    root_index = _read_search_index(root_source)
+    root_config = root_index.get("config", {})
+    shared_items = _search_items(root_index)
+    available_versions: dict[str, dict] = {}
+    outputs: dict[Path, dict] = {}
+
+    for entry in entries:
+        version = entry["version"]
+        version_root = publish_dir / version
+        source = _search_source(version_root, VERSION_SEARCH_SOURCE)
+        if source is None:
+            continue
+
+        version_index = _read_search_index(source)
+        if version_index.get("config", {}) != root_config:
+            raise DocsVersionError(
+                f"search config in {source} differs from {root_source}; rebuild both docs targets with the same config"
+            )
+        available_versions[version] = version_index
+        outputs[version_root / SEARCH_INDEX] = {
+            "config": root_config,
+            "items": _search_items(root_index, "../") + _search_items(version_index),
+        }
+
+    latest_index = available_versions.get(latest or "")
+    if latest and latest_index is None:
+        message = f"{latest}/{VERSION_SEARCH_SOURCE} is missing; root search will not include {latest} pages"
+        if require_root:
+            raise DocsVersionError(message)
+        print(f"warning: {message}", file=sys.stderr)
+    latest_items = _search_items(latest_index, f"{latest}/") if latest_index is not None else []
+    outputs[publish_dir / SEARCH_INDEX] = {
+        "config": root_config,
+        "items": shared_items + latest_items,
+    }
+    return outputs
+
+
+def write_search_indexes(outputs: dict[Path, dict]) -> None:
+    """Atomically replace each index after validation; files replace one at a time."""
+    for path, index in outputs.items():
+        content = json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n"
+        write_text_atomic(path, content)
+
+
 def markdown_page_output(page: str) -> Path:
     """Map a docs Markdown source path to its generated HTML page path."""
     if page == "index.md":
@@ -278,10 +397,17 @@ def cmd_finalize(args: argparse.Namespace) -> None:
     publish_dir: Path = args.publish_dir
 
     if args.target == ROOT:
-        latest = latest_version(load_manifest(publish_dir))
+        entries = load_manifest(publish_dir)
+        latest = latest_version(entries)
+        search_outputs = prepare_combined_search_indexes(
+            publish_dir, entries, latest, require_root=latest is not None
+        )
         if latest and (publish_dir / LATEST).is_dir():
             legacy_pages = write_legacy_redirects(publish_dir)
             print(f"==> root legacy URLs -> latest ({legacy_pages} redirect pages)")
+        write_search_indexes(search_outputs)
+        if search_outputs:
+            print(f"==> combined shared and versioned search indexes ({len(search_outputs)} indexes)")
         return
 
     # Without this page the version root and latest/ would redirect to a 404.
@@ -289,10 +415,15 @@ def cmd_finalize(args: argparse.Namespace) -> None:
         raise DocsVersionError(
             f"{args.target}/ has no {LANDING_PAGE}/ page; its root would redirect to a 404"
         )
-    write_version_landing(publish_dir, args.target)
+
     entries = build_manifest(load_manifest(publish_dir), args.target, args.release)
-    write_manifest(publish_dir, entries)
     latest = latest_version(entries)
+    search_outputs = prepare_combined_search_indexes(
+        publish_dir, entries, latest, require_root=args.release is not None
+    )
+
+    write_version_landing(publish_dir, args.target)
+    write_manifest(publish_dir, entries)
     if latest and (publish_dir / latest).is_dir():
         pages = write_latest_redirects(publish_dir, latest)
         print(f"==> latest -> {latest} ({pages} redirect pages)")
@@ -300,6 +431,10 @@ def cmd_finalize(args: argparse.Namespace) -> None:
         print(f"==> root legacy URLs -> latest ({legacy_pages} redirect pages)")
     else:
         shutil.rmtree(publish_dir / LATEST, ignore_errors=True)
+
+    write_search_indexes(search_outputs)
+    if search_outputs:
+        print(f"==> combined shared and versioned search indexes ({len(search_outputs)} indexes)")
 
 
 def build_parser() -> argparse.ArgumentParser:

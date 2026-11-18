@@ -108,11 +108,14 @@ if [[ "$TARGET" != root ]]; then
   trap 'rm -f "$BUILD_CONFIG"' EXIT
   sed "s|^site_url = \"https://apache.github.io/superset-kubernetes-operator/\"|site_url = \"https://apache.github.io/superset-kubernetes-operator/$TARGET/\"|" \
     "$CONFIG" > "$BUILD_CONFIG"
+  expected_site_url="site_url = \"https://apache.github.io/superset-kubernetes-operator/$TARGET/\""
+  grep -Fq "$expected_site_url" "$BUILD_CONFIG" || die "could not set the versioned site_url in $CONFIG"
 fi
 
 log "Building '$TARGET' with $(basename "$CONFIG")"
 "$ZENSICAL" build --clean --strict --config-file "$BUILD_CONFIG"
 [[ -d "$SITE_DIR" ]] || die "build output not found: $SITE_DIR (does site_dir in the config match --site-dir?)"
+[[ -f "$SITE_DIR/search.json" ]] || die "build produced no search.json (is search enabled in the config?)"
 
 if [[ "$TARGET" == root ]]; then
   log "Syncing root site into $PUBLISH_DIR"
@@ -124,11 +127,14 @@ if [[ "$TARGET" == root ]]; then
     --exclude='/[0-9]*.[0-9]*/' \
     --exclude='/latest/' \
     --exclude='/versions.json' \
+    --exclude='/search-unversioned.json' \
     "$SITE_DIR/" "$PUBLISH_DIR/"
+  cp "$PUBLISH_DIR/search.json" "$PUBLISH_DIR/search-unversioned.json"
 else
   log "Syncing into $PUBLISH_DIR/$TARGET/"
   mkdir -p "$PUBLISH_DIR/$TARGET"
   rsync -a --delete "$SITE_DIR/" "$PUBLISH_DIR/$TARGET/"
+  cp "$PUBLISH_DIR/$TARGET/search.json" "$PUBLISH_DIR/$TARGET/search-versioned.json"
 fi
 
 touch "$PUBLISH_DIR/.nojekyll"
