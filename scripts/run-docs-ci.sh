@@ -16,14 +16,15 @@
 
 # CI glue for .github/workflows/docs.yml.
 #
-#   run-docs-ci.sh env            print DOC_REF and DRY_RUN for >> "$GITHUB_ENV"
+#   run-docs-ci.sh env            print DOC_REF, DRY_RUN, and DOCS_FORCE for >> "$GITHUB_ENV"
 #   run-docs-ci.sh prepare        prepare current docs links or load backfill docs
-#   run-docs-ci.sh publish DIR    build the right slice(s) of the site into DIR
+#   run-docs-ci.sh publish DIR    build slices, then assemble them into DIR
 #   run-docs-ci.sh build SITE_DIR build once and save slices under SITE_DIR
 #   run-docs-ci.sh assemble SITE_DIR PUBLISH_DIR merge saved slices into PUBLISH_DIR
 #
-# `prepare` and `publish` read GITHUB_EVENT_NAME, GITHUB_REF_TYPE and DOC_REF
-# (the release tag for tag pushes and backfills, otherwise the branch name).
+# `prepare`, `build`, `assemble`, and `publish` read GITHUB_EVENT_NAME,
+# GITHUB_REF_TYPE and DOC_REF (the release tag for tag pushes and backfills,
+# otherwise the branch name). `build`, `assemble`, and `publish` also read DOCS_FORCE.
 # Requires jq (preinstalled on GitHub-hosted runners).
 set -euo pipefail
 
@@ -74,13 +75,15 @@ prepare() (
     # Swap in the tag's pages but keep today's other files, so anything the configs
     # reference (logo, extra CSS, ...) exists even if the tag predates it. javascripts/
     # and stylesheets/ stay as they are: they hold the current version switcher.
+    # Zensical's strict build still requires every page in today's nav to exist in the tag.
     find docs -name '*.md' -delete
     git archive FETCH_HEAD docs | tar -x --exclude='docs/javascripts' --exclude='docs/stylesheets'
     # Historical backfills keep version-to-version links relative to their own version.
-    python3 scripts/prepare_docs_links.py --docs-dir docs
+    python3 scripts/prepare_docs_links.py --docs-dir docs --allow-in-place
   else
     python3 scripts/prepare_docs_links.py \
       --docs-dir docs \
+      --allow-in-place \
       --versioned-prefix latest
   fi
 )
@@ -95,10 +98,20 @@ target_pairs() {
   fi
 }
 
-publish() {
-  local dir="$1" config target
+publish() (
+  local dir="$1" site_dir
+  site_dir="$(mktemp -d)"
+  trap 'rm -rf "$site_dir"' EXIT
+  build "$site_dir"
+  assemble "$site_dir" "$dir"
+)
+
+build() {
+  local site_dir="$1" config target
+  mkdir -p "$site_dir"
   local release_args=() force_args=()
-  mkdir -p "$dir"
+  local targets
+  targets="$(target_pairs)"
   if is_release; then
     release_vars
     release_args=(--release "$VERSION")
@@ -110,33 +123,19 @@ publish() {
     bash scripts/publish-docs.sh \
       --config "$config" \
       --target "$target" \
-      --publish-dir "$dir" \
       "${release_args[@]+"${release_args[@]}"}" \
-      "${force_args[@]+"${force_args[@]}"}"
-  done <<< "$(target_pairs)"
-}
-
-build() {
-  local site_dir="$1" config target
-  mkdir -p "$site_dir"
-  local release_args=()
-  if is_release; then
-    release_vars
-    release_args=(--release "$VERSION")
-  fi
-  while IFS=$'\t' read -r config target; do
-    bash scripts/publish-docs.sh \
-      --config "$config" \
-      --target "$target" \
-      "${release_args[@]+"${release_args[@]}"}" \
+      "${force_args[@]+"${force_args[@]}"}" \
       --build-only \
-      --artifact-dir "$site_dir/$target"
-  done <<< "$(target_pairs)"
+      --artifact-dir "$site_dir/$target" \
+      < /dev/null
+  done <<< "$targets"
 }
 
 assemble() {
   local site_dir="$1" publish_dir="$2" config target
   local release_args=() force_args=()
+  local targets
+  targets="$(target_pairs)"
   mkdir -p "$publish_dir"
   if is_release; then
     release_vars
@@ -153,8 +152,9 @@ assemble() {
       "${release_args[@]+"${release_args[@]}"}" \
       --assemble-only \
       --artifact-dir "$site_dir/$target" \
-      "${force_args[@]+"${force_args[@]}"}"
-  done <<< "$(target_pairs)"
+      "${force_args[@]+"${force_args[@]}"}" \
+      < /dev/null
+  done <<< "$targets"
 }
 
 case "${1:-}" in

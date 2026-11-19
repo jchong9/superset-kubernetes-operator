@@ -21,16 +21,18 @@ Docs are written with plain relative .md links; this makes them work across sect
   * shared page -> versioned page  absolute URL under /<prefix>/ (for example latest)
   * versioned -> versioned         left relative, so each version stays self-contained
 
-Only inline markdown links are handled (not reference-style, raw HTML, or code
-fences), and doc file names must not contain spaces or parentheses. Files are
+Only inline markdown links are handled (not reference-style, raw HTML, inline
+code spans, indented code blocks, or fenced code), and doc file names must not
+contain spaces or parentheses. Files are
 rewritten in place: run it in CI or on a throwaway copy of docs/. Query strings
 and fragments are preserved when a local page link is rewritten.
 
 Usage::
 
-    prepare_docs_links.py --docs-dir DIR [--versioned-prefix PREFIX]
+    prepare_docs_links.py --docs-dir DIR [--allow-in-place] [--versioned-prefix PREFIX]
 
     --docs-dir          the docs/ tree to rewrite
+    --allow-in-place    allow rewriting the repository's docs/ tree directly
     --versioned-prefix  also rewrite shared -> versioned links under /PREFIX/ (use
                         ``latest`` for normal builds; omit for historical backfills,
                         where shared pages are not built)
@@ -50,9 +52,13 @@ import argparse
 import posixpath
 import re
 from pathlib import Path, PurePosixPath
+from urllib.parse import urlsplit
 
-# GitHub Pages serves this project under its repository name (must match site_url).
-SITE_PATH_PREFIX = "/superset-kubernetes-operator"
+# Canonical public URL; keep the three Zensical configs in sync with this value.
+SITE_URL = "https://apache.github.io/superset-kubernetes-operator/"
+_site = urlsplit(SITE_URL)
+SITE_ORIGIN = f"{_site.scheme}://{_site.netloc}"
+SITE_PATH_PREFIX = _site.path.rstrip("/")
 
 # Pages built at the site root, as paths relative to docs/
 SHARED_PAGES = frozenset(
@@ -68,8 +74,8 @@ SHARED_PAGES = frozenset(
 )
 # [text](target) or [text](target "title")
 MARKDOWN_LINK = re.compile(r"\]\((?P<target>[^)\s]+)(?P<title>\s+(?:\"[^\"]*\"|'[^']*'))?\)")
-FENCE_START = re.compile(r"^ {0,3}(`{3,}|~{3,})")
-FENCE_END = re.compile(r"^ {0,3}(`+|~+)[ \t]*(?:\r?\n)?$")
+FENCE_START = re.compile(r"^\s*(`{3,}|~{3,})")
+FENCE_END = re.compile(r"^\s*(`+|~+)[ \t]*(?:\r?\n)?$")
 
 
 def rewrite_outside_fenced_code(text: str, replace) -> str:
@@ -122,7 +128,7 @@ def rewrite_file(
     # Only shared pages point at versioned pages by URL. A versioned page's links to
     # other versioned pages must stay relative or they would jump to another version.
     link_to_versioned = versioned_pages if relative.as_posix() in SHARED_PAGES else None
-    original = path.read_text()
+    original = path.read_text(encoding="utf-8")
 
     def replace(match: re.Match[str]) -> str:
         target = match.group("target")
@@ -149,7 +155,7 @@ def rewrite_file(
     rewritten = rewrite_outside_fenced_code(original, replace)
     if rewritten == original:
         return False
-    path.write_text(rewritten)
+    path.write_text(rewritten, encoding="utf-8")
     return True
 
 
@@ -157,10 +163,22 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--docs-dir", type=Path, required=True)
     parser.add_argument(
+        "--allow-in-place",
+        action="store_true",
+        help="allow rewriting the repository's docs/ tree directly",
+    )
+    parser.add_argument(
         "--versioned-prefix",
         help="rewrite links from shared pages to versioned pages under this URL prefix (for example, latest)",
     )
     args = parser.parse_args()
+    if not args.docs_dir.is_dir():
+        parser.error(f"docs directory does not exist: {args.docs_dir}")
+    repository_root = Path(__file__).resolve().parent.parent
+    repository_docs = repository_root / "docs"
+    has_git_metadata = (repository_root / ".git").exists()
+    if has_git_metadata and args.docs_dir.resolve() == repository_docs.resolve() and not args.allow_in_place:
+        parser.error("refusing to rewrite the repository docs/ tree without --allow-in-place")
     prefix = args.versioned_prefix.strip("/") if args.versioned_prefix else None
     if args.versioned_prefix is not None and not prefix:
         parser.error("--versioned-prefix must contain a path segment")
