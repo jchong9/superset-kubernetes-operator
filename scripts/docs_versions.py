@@ -23,6 +23,8 @@ Layout under the publish directory::
     /0.3/, /0.4/ ...  one directory per minor release; patches overwrite their minor
     /latest/          redirect pages into the newest minor (into ``main`` before the first release)
     /versions.json    manifest read by docs/javascripts/version-switcher.js
+    /search-*.json    preserved source indexes used to build combined search.json files
+    /sitemap-root.xml preserved shared-page sitemap included in the sitemap index
 
 Versioned builds have no Home page, so each version root redirects to ``LANDING_PAGE``.
 
@@ -42,7 +44,7 @@ Usage (normally run by publish-docs.sh, not by hand)::
 
     check     validate target/release and refuse patch downgrades; run before building
     finalize  update versions.json, write the version landing page, regenerate latest/
-              redirects; run after the site is synced into DIR
+              redirects, merge search indexes, and write the sitemap index after sync
 
 TARGET is ``root``, ``main`` or a minor such as ``0.3``; ``--release`` is only valid
 for a minor and must be a final X.Y.Z of that minor. Example::
@@ -63,7 +65,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from prepare_docs_links import SHARED_PAGES, SITE_PATH_PREFIX
+from prepare_docs_links import SHARED_PAGES, SITE_ORIGIN, SITE_PATH_PREFIX
 
 ROOT = "root"
 MAIN = "main"
@@ -76,8 +78,8 @@ ROOT_SEARCH_SOURCE = "search-unversioned.json"
 VERSION_SEARCH_SOURCE = "search-versioned.json"
 LEGACY_REDIRECT_MARKER = "<!-- superset-operator-generated-legacy-redirect -->"
 
-MINOR_RE = re.compile(r"^[0-9]+\.[0-9]+$")
-FINAL_RELEASE_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")  # no pre-release suffix: RCs are never published
+MINOR_RE = re.compile(r"[0-9]+\.[0-9]+")
+FINAL_RELEASE_RE = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")  # RCs are never published
 
 
 class DocsVersionError(Exception):
@@ -228,13 +230,12 @@ def write_sitemap_index(publish_dir: Path, entries: list[dict], *, root_build: b
     sitemap_paths.extend(
         f"{entry['version']}/sitemap.xml"
         for entry in entries
-        if (entry["version"] == MAIN or MINOR_RE.fullmatch(entry["version"]))
-        and (publish_dir / entry["version"] / "sitemap.xml").is_file()
+        if (publish_dir / entry["version"] / "sitemap.xml").is_file()
     )
     for path in sitemap_paths:
         sitemap = ET.SubElement(index, f"{{{namespace}}}sitemap")
         location = ET.SubElement(sitemap, f"{{{namespace}}}loc")
-        location.text = f"https://apache.github.io{SITE_PATH_PREFIX}/{path}"
+        location.text = f"{SITE_ORIGIN}{SITE_PATH_PREFIX}/{path}"
     content = ET.tostring(index, encoding="unicode")
     write_text_atomic(
         publish_dir / "sitemap.xml",
@@ -257,12 +258,13 @@ def redirect_page(relative_url: str, label: str) -> str:
     """
     rel_attr = html.escape(relative_url, quote=True)
     label_html = html.escape(label)
+    script_url = json.dumps(relative_url).replace("<", "\\u003c")
     return (
         "<!doctype html>\n"
         '<meta charset="utf-8">\n'
         f"<title>Redirecting to {label_html}</title>\n"
         f'<noscript><meta http-equiv="refresh" content="0; url={rel_attr}"></noscript>\n'
-        f"<script>location.replace(new URL({json.dumps(relative_url)}, location.href).href"
+        f"<script>location.replace(new URL({script_url}, location.href).href"
         " + location.search + location.hash)</script>\n"
         f'<p>Redirecting to <a href="{rel_attr}">{label_html}</a>…</p>\n'
     )
@@ -282,13 +284,12 @@ def write_latest_redirects(publish_dir: Path, latest: str) -> int:
     """Mirror ``<latest>/`` as redirect pages under ``latest/``; returns the page count."""
     alias_root = publish_dir / LATEST
     source_root = publish_dir / latest
-    shutil.rmtree(alias_root, ignore_errors=True)
+    if alias_root.exists():
+        shutil.rmtree(alias_root)
 
     count = 0
     for source in redirectable_pages(source_root):
         relative = source.relative_to(source_root)
-        if relative.as_posix() == "404.html":
-            continue
         parent = relative.parent.as_posix()
         if relative.as_posix() == "index.html":
             # The version root is itself a redirect; skip that hop.
@@ -302,7 +303,7 @@ def write_latest_redirects(publish_dir: Path, latest: str) -> int:
 
         out = alias_root / relative
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(redirect_page(relative_url, "the latest documentation"), encoding="utf-8")
+        write_text_atomic(out, redirect_page(relative_url, "the latest documentation"))
         count += 1
     return count
 
@@ -326,9 +327,9 @@ def write_legacy_redirects(publish_dir: Path) -> int:
         target = f"{SITE_PATH_PREFIX}/{LATEST}/{relative.as_posix()}"
         if relative.name == "index.html":
             target = target.removesuffix("index.html")
-        destination.write_text(
+        write_text_atomic(
+            destination,
             redirect_page(target, "the latest documentation") + f"{LEGACY_REDIRECT_MARKER}\n",
-            encoding="utf-8",
         )
         count += 1
     return count
@@ -375,45 +376,60 @@ def _search_items(index: dict, location_prefix: str = "") -> list[dict]:
 
 
 def prepare_combined_search_indexes(
-    publish_dir: Path, entries: list[dict], latest: str | None, require_root: bool = False
+    publish_dir: Path, entries: list[dict], latest: str | None, strict_target: str | None = None
 ) -> dict[Path, dict]:
     """Read and validate source indexes, then prepare outputs without changing the site."""
     root_source = _search_source(publish_dir, ROOT_SEARCH_SOURCE)
     if root_source is None:
         message = f"{ROOT_SEARCH_SOURCE} is missing; search indexes were not combined"
-        if require_root:
-            raise DocsVersionError(f"{message} for a release publish")
+        if strict_target:
+            raise DocsVersionError(f"{message} for target {strict_target}")
         print(f"warning: {message}", file=sys.stderr)
         return {}
 
     root_index = _read_search_index(root_source)
     root_config = root_index.get("config", {})
     shared_items = _search_items(root_index)
-    available_versions: dict[str, dict] = {}
+    latest_index: dict | None = None
     outputs: dict[Path, dict] = {}
 
+    # The just-built target must be valid; malformed historical version indexes can be skipped.
     for entry in entries:
         version = entry["version"]
         version_root = publish_dir / version
         source = _search_source(version_root, VERSION_SEARCH_SOURCE)
         if source is None:
+            if version == strict_target:
+                if version == latest:
+                    raise DocsVersionError(
+                        f"{version}/{VERSION_SEARCH_SOURCE} is missing; root search will not include {version} pages"
+                    )
+                raise DocsVersionError(f"{version_root / VERSION_SEARCH_SOURCE} is missing")
             continue
 
-        version_index = _read_search_index(source)
-        if version_index.get("config", {}) != root_config:
-            raise DocsVersionError(
-                f"search config in {source} differs from {root_source}; rebuild both docs targets with the same config"
-            )
-        available_versions[version] = version_index
+        try:
+            version_index = _read_search_index(source)
+            if version_index.get("config", {}) != root_config:
+                raise DocsVersionError(
+                    f"search config in {source} differs from {root_source}; rebuild both docs targets with the same config"
+                )
+            version_items = _search_items(version_index)
+        except DocsVersionError as exc:
+            if version == strict_target:
+                raise
+            print(f"warning: skipping {version} search index: {exc}", file=sys.stderr)
+            continue
+
+        if version == latest:
+            latest_index = version_index
         outputs[version_root / SEARCH_INDEX] = {
             "config": root_config,
-            "items": _search_items(root_index, "../") + _search_items(version_index),
+            "items": _search_items(root_index, "../") + version_items,
         }
 
-    latest_index = available_versions.get(latest or "")
     if latest and latest_index is None:
         message = f"{latest}/{VERSION_SEARCH_SOURCE} is missing; root search will not include {latest} pages"
-        if require_root:
+        if latest == strict_target:
             raise DocsVersionError(message)
         print(f"warning: {message}", file=sys.stderr)
     latest_items = _search_items(latest_index, f"{latest}/") if latest_index is not None else []
@@ -460,11 +476,11 @@ def cmd_finalize(args: argparse.Namespace) -> None:
 
     if args.target == ROOT:
         entries = load_manifest(publish_dir)
-        write_sitemap_index(publish_dir, entries, root_build=True)
         latest = latest_version(entries)
         search_outputs = prepare_combined_search_indexes(
-            publish_dir, entries, latest, require_root=latest is not None
+            publish_dir, entries, latest, strict_target=ROOT
         )
+        write_sitemap_index(publish_dir, entries, root_build=True)
         if latest and (publish_dir / LATEST).is_dir():
             legacy_pages = write_legacy_redirects(publish_dir)
             print(f"==> root legacy URLs -> latest ({legacy_pages} redirect pages)")
@@ -482,7 +498,7 @@ def cmd_finalize(args: argparse.Namespace) -> None:
     entries = build_manifest(load_manifest(publish_dir), args.target, args.release)
     latest = latest_version(entries)
     search_outputs = prepare_combined_search_indexes(
-        publish_dir, entries, latest, require_root=args.release is not None
+        publish_dir, entries, latest, strict_target=args.target
     )
 
     write_version_landing(publish_dir, args.target)
@@ -494,7 +510,9 @@ def cmd_finalize(args: argparse.Namespace) -> None:
         legacy_pages = write_legacy_redirects(publish_dir)
         print(f"==> root legacy URLs -> latest ({legacy_pages} redirect pages)")
     else:
-        shutil.rmtree(publish_dir / LATEST, ignore_errors=True)
+        latest_dir = publish_dir / LATEST
+        if latest_dir.exists():
+            shutil.rmtree(latest_dir)
 
     write_search_indexes(search_outputs)
     if search_outputs:

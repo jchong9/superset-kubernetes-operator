@@ -22,14 +22,14 @@ on:
     tags: ["v*"]
     paths: &docs_paths
       - "docs/**"
+      - "zensical.toml"
+      - "zensical-unversioned.toml"
+      - "zensical-versioned.toml"
       - "scripts/publish-docs.sh"
       - "scripts/run-docs-ci.sh"
       - "scripts/docs_versions.py"
       - "scripts/prepare_docs_links.py"
       - "scripts/test_docs_scripts.py"
-      - "zensical.toml"
-      - "zensical-unversioned.toml"
-      - "zensical-versioned.toml"
       - "docs-requirements.in"
       - "docs-requirements.txt"
       - "Makefile"

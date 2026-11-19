@@ -218,7 +218,7 @@ class DocsVersionsTest(unittest.TestCase):
             entries = dv.build_manifest([], "0.4", "0.4.0")
             (root / "search-unversioned.json").write_text(json.dumps({"config": {}, "items": []}))
             with self.assertRaisesRegex(dv.DocsVersionError, "root search will not include 0.4 pages"):
-                dv.prepare_combined_search_indexes(root, entries, "0.4", require_root=True)
+                dv.prepare_combined_search_indexes(root, entries, "0.4", strict_target="0.4")
 
     def test_finalize_warns_when_latest_search_source_is_missing(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -235,7 +235,7 @@ class DocsVersionsTest(unittest.TestCase):
             self.assertIn("0.4/search-versioned.json is missing", stderr.getvalue())
             self.assertEqual(outputs[root / "search.json"]["items"][0]["location"], "shared/")
 
-    def test_finalize_warns_without_root_search_source_and_preserves_indexes(self):
+    def test_finalize_requires_root_search_source_before_writing_indexes(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.make_site(root, "main", landing=True)
@@ -248,7 +248,7 @@ class DocsVersionsTest(unittest.TestCase):
             args = ["finalize", "--publish-dir", str(root), "--target", "main"]
 
             with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(dv.main(args), 0)
+                self.assertEqual(dv.main(args), 2)
 
             self.assertIn("search-unversioned.json is missing", stderr.getvalue())
             self.assertEqual((root / "main/search.json").read_bytes(), original_index)
@@ -266,7 +266,7 @@ class DocsVersionsTest(unittest.TestCase):
             with contextlib.redirect_stderr(stderr):
                 self.assertEqual(dv.main(args), 2)
 
-            self.assertIn("for a release publish", stderr.getvalue())
+            self.assertIn("target 0.3", stderr.getvalue())
             self.assertFalse((root / dv.MANIFEST).exists())
             self.assertEqual((root / "0.3/index.html").read_text(), "<html></html>")
 
@@ -288,6 +288,21 @@ class DocsVersionsTest(unittest.TestCase):
             self.assertFalse((root / dv.MANIFEST).exists())
             self.assertEqual((root / "0.3/index.html").read_text(), "<html></html>")
             self.assertFalse((root / "latest").exists())
+
+    def test_release_finalize_skips_bad_search_index_of_other_versions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.make_site(root, "0.3", landing=True)
+            self.make_site(root, "0.4", landing=True)
+            entries = dv.build_manifest(dv.build_manifest([], "0.3", "0.3.0"), "0.4", "0.4.0")
+            dv.write_manifest(root, entries)
+            empty = json.dumps({"config": {}, "items": []})
+            (root / "search-unversioned.json").write_text(empty)
+            (root / "0.3/search-versioned.json").write_text("{")
+            (root / "0.4/search-versioned.json").write_text(empty)
+            args = ["finalize", "--publish-dir", str(root), "--target", "0.4", "--release", "0.4.0"]
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(dv.main(args), 0)
 
     def test_finalize_rejects_mismatched_search_configs_before_writing_state(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -446,11 +461,12 @@ class DocumentationLinkPreparationTest(unittest.TestCase):
         self.assertEqual(root_only, set(phd.SHARED_PAGES))
 
     def test_site_path_prefix_matches_site_url(self):
-        for name in ("zensical-unversioned.toml", "zensical-versioned.toml"):
+        for name in ("zensical.toml", "zensical-unversioned.toml", "zensical-versioned.toml"):
             site_url = self.project_config(name).get("site_url")
             if not site_url:
                 continue
             with self.subTest(config=name):
+                self.assertEqual(site_url, phd.SITE_URL)
                 self.assertEqual(urlparse(site_url).path.rstrip("/"), phd.SITE_PATH_PREFIX)
 
     def test_theme_preference_scope_is_shared_across_configs(self):
