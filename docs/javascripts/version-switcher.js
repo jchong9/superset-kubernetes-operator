@@ -124,7 +124,14 @@
   function rewriteRootVersionLinks(root, version) {
     document.querySelectorAll("a[href]").forEach((link) => {
       if (link.hasAttribute("data-version-link") || link.closest(`.${SWITCHER_CLASS}`)) return;
-      const pathname = retargetedPath(root, version, link, { aliasOnly: true });
+      if (!link.dataset.latestPath) {
+        if (retargetedPath(root, version, link, { aliasOnly: true }) === null) return;
+        link.dataset.latestPath = link.pathname;
+      }
+      const pathname = retargetedPath(root, version, {
+        origin: link.origin,
+        pathname: link.dataset.latestPath,
+      });
       if (pathname !== null) setLinkPath(link, pathname);
     });
   }
@@ -144,12 +151,11 @@
   }
 
   function retargetSearchResult(event) {
-    if (!searchTarget) return null;
+    if (!searchTarget) return;
     const link = searchResultLink(event);
-    if (!link) return null;
+    if (!link) return;
     const pathname = retargetedPath(searchTarget.root, searchTarget.version, link);
     if (pathname !== null) setLinkPath(link, pathname);
-    return link;
   }
 
   function normalizeVersions(raw) {
@@ -188,7 +194,11 @@
 
   // The target version may not have this page.
   function pageExists(url) {
-    return fetch(url, { method: "HEAD" })
+    const signal =
+      typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+        ? AbortSignal.timeout(3000)
+        : undefined;
+    return fetch(url, { method: "HEAD", signal })
       .then((response) => response.ok)
       .catch(() => true); // offline or blocked HEAD: just navigate
   }
@@ -287,9 +297,10 @@
 
   function renderSelector(ctx) {
     const { versions, root, segment, current, latest, preferred } = ctx;
+    if (!document.querySelector(".md-header__inner")) return;
     const nav = document.querySelector(`.${SWITCHER_CLASS}`) || createSelector();
     // On a shared page, show the last-viewed version rather than latest.
-    const selected = current || preferred || latest || versions[0];
+    const selected = current || (segment ? { title: segment } : preferred || latest || versions[0]);
 
     nav.querySelector(`.${SWITCHER_CLASS}__label`).textContent = selected.title;
 
@@ -374,10 +385,6 @@
     } else {
       callback();
     }
-    // Without document$, re-render if the theme swaps the header out.
-    new MutationObserver(() => {
-      if (!document.querySelector(`.${SWITCHER_CLASS}`)) callback();
-    }).observe(document.body, { childList: true, subtree: true });
   }
 
   onPageReady(() => versionsPromise.then(render));
