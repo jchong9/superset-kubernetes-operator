@@ -17,7 +17,7 @@ name: Docs
 
 on:
   push:
-    branches: [main]
+    branches: [main, docs/improve-docs-versioning]
     # Match version tags broadly; the build job skips prereleases and validates X.Y.Z.
     tags: ["v*"]
     paths: &docs_paths
