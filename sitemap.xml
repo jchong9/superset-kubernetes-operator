@@ -1,24 +1,2 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/contributing/development-guidelines/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/contributing/development-setup/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/contributing/releasing/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/reference/downloads/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/reference/releases/</loc>
-      </url>
-      <url>
-        <loc>https://apache.github.io/superset-kubernetes-operator/reference/security/</loc>
-      </url>
-</urlset>
+<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>https://apache.github.io/superset-kubernetes-operator/sitemap-root.xml</loc></sitemap><sitemap><loc>https://apache.github.io/superset-kubernetes-operator/main/sitemap.xml</loc></sitemap></sitemapindex>
