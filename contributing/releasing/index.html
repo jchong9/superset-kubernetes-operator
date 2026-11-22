@@ -14,8 +14,6 @@
       
       
       
-        <link rel="prev" href="../development-guidelines/">
-      
       
       
         
@@ -240,7 +238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="/superset-kubernetes-operator/" class="md-nav__link">
         
   
   
@@ -683,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/downloads/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/downloads/" class="md-nav__link">
         
   
   
@@ -710,7 +708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/releases/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/releases/" class="md-nav__link">
         
   
   
@@ -737,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/security/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/security/" class="md-nav__link">
         
   
   
@@ -769,8 +767,6 @@
       
   
   
-    
-  
   
   
     
@@ -783,11 +779,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
@@ -808,7 +806,7 @@
           </label>
         
         
-          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
             <label class="md-nav__title" for="__nav_6">
               <span class="md-nav__icon md-icon"></span>
               
@@ -825,7 +823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development-setup/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/development-setup/" class="md-nav__link">
         
   
   
@@ -852,7 +850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development-guidelines/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/development-guidelines/" class="md-nav__link">
         
   
   
@@ -876,36 +874,10 @@
                   
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Releasing
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="././" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="/superset-kubernetes-operator/contributing/releasing/" class="md-nav__link">
         
   
   
@@ -920,204 +892,6 @@
   
 
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ci-supply-chain" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        CI &amp; Supply Chain
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CI &amp; Supply Chain">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#github-actions-pinning" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        GitHub Actions pinning
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tool-binary-pinning" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Tool binary pinning
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#workflow-permissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Workflow permissions
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#renovate" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Renovate
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#versioning" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Versioning
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-checklist" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Release Checklist
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reviewing-the-changelog" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Reviewing the Changelog
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#creating-a-release-candidate" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Creating a Release Candidate
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#asf-source-release-artifacts" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        ASF Source Release Artifacts
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ASF Source Release Artifacts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pre-requisites-for-the-release-manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Pre-requisites for the release manager
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#producing-the-source-tarball" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Producing the source tarball
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#staging-the-artifacts" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Staging the artifacts
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#vote-email-template" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Vote email template
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#finalizing-a-release" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Finalizing a Release
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1604,7 +1378,7 @@ under the License.
 <a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>git<span class="w"> </span>push<span class="w"> </span>upstream<span class="w"> </span>v0.2.0
 </code></pre></div>
 <p>The release workflow pushes the <code>0.2.0</code> and <code>latest</code> images to GHCR.</p>
-<p>After the final tag is pushed, open a PR against <code>main</code> (the docs site builds from <code>main</code>) that carries the release's changelog section with the final date. For the first RC of a minor release the reviewed <code>## &lt;version&gt;</code> section was committed on the release branch only, so cherry-pick that commit onto <code>main</code> and change the heading to <code>## &lt;version&gt; - &lt;date&gt;</code>. Entries that reached <code>main</code>'s <code>## Unreleased</code> after the release branch was cut belong to the next release: keep them under <code>## Unreleased</code> when resolving the cherry-pick conflict, and confirm the <code>## &lt;version&gt;</code> section body matches the release branch exactly:</p>
+<p>After the final tag is pushed, open a PR against <code>main</code> (the Releases page is part of the unversioned docs, which are built from <code>main</code>) that carries the release's changelog section with the final date. For the first RC of a minor release the reviewed <code>## &lt;version&gt;</code> section was committed on the release branch only, so cherry-pick that commit onto <code>main</code> and change the heading to <code>## &lt;version&gt; - &lt;date&gt;</code>. Entries that reached <code>main</code>'s <code>## Unreleased</code> after the release branch was cut belong to the next release: keep them under <code>## Unreleased</code> when resolving the cherry-pick conflict, and confirm the <code>## &lt;version&gt;</code> section body matches the release branch exactly:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>section<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'/^## 0\.2\.0/{f=1;next} /^## /{f=0} f'</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>diff<span class="w"> </span>&lt;<span class="o">(</span>git<span class="w"> </span>show<span class="w"> </span><span class="m">0</span>.2:docs/reference/releases.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>section<span class="o">)</span><span class="w"> </span>&lt;<span class="o">(</span>section<span class="w"> </span>&lt;<span class="w"> </span>docs/reference/releases.md<span class="o">)</span>
 </code></pre></div>
