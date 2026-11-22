@@ -31,6 +31,13 @@
   const BANNER_ID = "docs-version-banner";
   // Namespaced because GitHub Pages projects share one origin.
   const VERSION_STORAGE_PREFIX = "superset-kubernetes-operator-docs-version:";
+  let storageWarningShown = false;
+
+  function warnStorageError(error) {
+    if (storageWarningShown) return;
+    storageWarningShown = true;
+    console.warn("version-switcher: could not access the saved documentation version", error);
+  }
 
   // ---- paths ----
 
@@ -87,7 +94,7 @@
       const preferred = window.sessionStorage.getItem(`${VERSION_STORAGE_PREFIX}${root}`);
       return versions.find((entry) => entry.version === preferred);
     } catch (error) {
-      console.warn("version-switcher: could not read the saved documentation version", error);
+      warnStorageError(error);
       return undefined;
     }
   }
@@ -96,7 +103,7 @@
     try {
       window.sessionStorage.setItem(`${VERSION_STORAGE_PREFIX}${root}`, version);
     } catch (error) {
-      console.warn("version-switcher: could not save the selected documentation version", error);
+      warnStorageError(error);
     }
   }
 
@@ -105,28 +112,56 @@
     link.setAttribute("href", `${pathname}${link.search}${link.hash}`);
   }
 
-  // Shared pages link to /latest/...; point them at the reader's version instead.
+  /** Return the selected-version path for a versioned link, or null when it is unrelated. */
+  function retargetedPath(root, version, link, { aliasOnly = false } = {}) {
+    if (link.origin !== window.location.origin || !link.pathname.startsWith(root)) return null;
+    const path = link.pathname.slice(root.length);
+    const first = pathParts(path)[0];
+    if (!first || !VERSION_SEGMENT.test(first) || (aliasOnly && first !== LATEST)) return null;
+    return `${root}${version}/${path.slice(first.length + 1)}`;
+  }
+
   function rewriteRootVersionLinks(root, version) {
     document.querySelectorAll("a[href]").forEach((link) => {
-      if (
-        link.origin !== window.location.origin ||
-        link.hasAttribute("data-version-link") ||
-        link.closest(`.${SWITCHER_CLASS}`)
-      ) {
-        return;
+      if (link.hasAttribute("data-version-link") || link.closest(`.${SWITCHER_CLASS}`)) return;
+      if (!link.dataset.latestPath) {
+        if (retargetedPath(root, version, link, { aliasOnly: true }) === null) return;
+        link.dataset.latestPath = link.pathname;
       }
-      const path = link.pathname.slice(root.length);
-      const firstSegment = pathParts(path)[0];
-      if (firstSegment && VERSION_SEGMENT.test(firstSegment)) {
-        setLinkPath(link, `${root}${version}/${path.slice(firstSegment.length + 1)}`);
-      }
+      const pathname = retargetedPath(root, version, {
+        origin: link.origin,
+        pathname: link.dataset.latestPath,
+      });
+      if (pathname !== null) setLinkPath(link, pathname);
     });
+  }
+
+  // Zensical renders search results in an open Shadow DOM, so use composed events
+  // instead of document selectors or mutation observers.
+  let searchTarget = null;
+
+  function searchResultLink(event) {
+    const path = event.composedPath();
+    const inSearchResults = path.some(
+      (node) => node instanceof Element && node.getAttribute("role") === "listbox"
+    );
+    return inSearchResults
+      ? path.find((node) => node instanceof HTMLAnchorElement && node.getAttribute("role") === "option")
+      : null;
+  }
+
+  function retargetSearchResult(event) {
+    if (!searchTarget) return;
+    const link = searchResultLink(event);
+    if (!link) return;
+    const pathname = retargetedPath(searchTarget.root, searchTarget.version, link);
+    if (pathname !== null) setLinkPath(link, pathname);
   }
 
   function normalizeVersions(raw) {
     if (!Array.isArray(raw)) return [];
     return raw
-      .filter((entry) => entry && typeof entry.version === "string")
+      .filter((entry) => entry && typeof entry.version === "string" && VERSION_SEGMENT.test(entry.version))
       .map((entry) => ({
         version: entry.version,
         title: entry.title || entry.version,
@@ -135,28 +170,41 @@
   }
 
   /**
-   * Only the fetch/parse is guarded so rendering bugs stay visible. The fallback
-   * keeps the selector working without a manifest (e.g. a plain `zensical serve`).
+   * Only local previews may use a fallback. Published pages hide the switcher
+   * when the shared manifest is missing or invalid.
    */
   function loadVersions(root) {
-    const fallback = [{ version: "main", title: "main (unreleased)", aliases: [] }];
+    if (!root) return Promise.resolve([]);
     return fetch(`${root}versions.json`)
-      .then((response) => (response.ok ? response.json() : fallback))
+      .then((response) => {
+        if (!response.ok) throw new Error(`versions.json returned ${response.status}`);
+        return response.json();
+      })
       .then((raw) => {
         const versions = normalizeVersions(raw);
-        return versions.length ? versions : fallback;
+        if (versions.length) return versions;
+        throw new Error("versions.json contains no valid versions");
       })
       .catch((error) => {
         console.warn("version-switcher: could not load versions.json", error);
-        return fallback;
+        return window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+          ? [{ version: "main", title: "main (unreleased)", aliases: [] }]
+          : [];
       });
   }
+
+  // The manifest is shared by navigation and search routing.
+  const versionsPromise = loadVersions(resolveSiteRoot());
 
   // ---- navigation ----
 
   // The target version may not have this page.
   function pageExists(url) {
-    return fetch(url, { method: "HEAD" })
+    const signal =
+      typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+        ? AbortSignal.timeout(3000)
+        : undefined;
+    return fetch(url, { method: "HEAD", signal })
       .then((response) => response.ok)
       .catch(() => true); // offline or blocked HEAD: just navigate
   }
@@ -174,8 +222,9 @@
       savePreferredVersion(root, link.dataset.versionPreference);
       // A shared page has no versioned twin: stay here and retarget its links.
       if (!detectVersionSegment(root)) {
-        rewriteRootVersionLinks(root, link.dataset.versionPreference);
-        render(await versionsPromise);
+        // Zensical loads its search index once during startup. Reload the shared
+        // page so the early search router can load the newly selected version's index.
+        window.location.reload();
         return;
       }
     }
@@ -184,6 +233,32 @@
       : link.dataset.fallback;
     window.location.assign(destination);
   }
+
+  // ---- search results ----
+
+  for (const eventName of ["pointerover", "focusin"]) {
+    document.addEventListener(eventName, retargetSearchResult, true);
+  }
+
+  document.addEventListener(
+    "click",
+    async (event) => {
+      if (!searchTarget) return;
+      const link = searchResultLink(event);
+      const modified = event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
+      if (!link || event.defaultPrevented || event.button !== 0 || modified) return;
+
+      const { root, version } = searchTarget;
+      const pathname = retargetedPath(root, version, link);
+      if (pathname === null) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setLinkPath(link, pathname);
+      const destination = (await pageExists(link.href)) ? link.href : `${root}${version}/`;
+      window.location.assign(destination);
+    },
+    true
+  );
 
   function makeVersionLink(root, entryOrSegment, currentSegment) {
     const segment = typeof entryOrSegment === "string" ? entryOrSegment : segmentFor(entryOrSegment);
@@ -207,16 +282,24 @@
     nav.className = `md-version ${SWITCHER_CLASS}`;
     nav.setAttribute("aria-label", "Documentation version");
 
-    const toggle = document.createElement("a");
+    const toggle = document.createElement("button");
+    toggle.type = "button";
     toggle.className = "md-version__current";
-    toggle.href = "#";
     toggle.setAttribute("aria-label", "Select documentation version");
+    toggle.setAttribute("aria-expanded", "false");
     const label = document.createElement("span");
     label.className = `${SWITCHER_CLASS}__label`;
     toggle.appendChild(label);
 
     const list = document.createElement("ul");
     list.className = "md-version__list";
+    toggle.setAttribute("aria-controls", `${SWITCHER_CLASS}-list`);
+    list.id = `${SWITCHER_CLASS}-list`;
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      nav.classList.toggle("md-version--active", !expanded);
+    });
     list.addEventListener("click", onVersionLinkClick);
 
     nav.append(toggle, list);
@@ -230,9 +313,10 @@
 
   function renderSelector(ctx) {
     const { versions, root, segment, current, latest, preferred } = ctx;
+    if (!document.querySelector(".md-header__inner")) return;
     const nav = document.querySelector(`.${SWITCHER_CLASS}`) || createSelector();
     // On a shared page, show the last-viewed version rather than latest.
-    const selected = current || preferred || latest || versions[0];
+    const selected = current || (segment ? { title: segment } : preferred || latest || versions[0]);
 
     nav.querySelector(`.${SWITCHER_CLASS}__label`).textContent = selected.title;
 
@@ -240,7 +324,7 @@
       const link = makeVersionLink(root, entry, segment);
       link.className = "md-version__link";
       link.textContent = isLatest(entry) ? `${entry.title} (latest)` : entry.title;
-      link.setAttribute("aria-current", entry === selected ? "true" : "false");
+      if (entry === selected) link.setAttribute("aria-current", "page");
       const item = document.createElement("li");
       item.className = "md-version__item";
       item.appendChild(link);
@@ -285,7 +369,11 @@
     const latest = versions.find(isLatest);
     const preferred = getPreferredVersion(root, versions);
     if (!segment) {
-      rewriteRootVersionLinks(root, preferred?.version || latest?.version || "main");
+      const version = preferred?.version || latest?.version || "main";
+      searchTarget = { root, version };
+      rewriteRootVersionLinks(root, version);
+    } else {
+      searchTarget = null;
     }
     const ctx = {
       versions,
@@ -313,12 +401,7 @@
     } else {
       callback();
     }
-    // Without document$, re-render if the theme swaps the header out.
-    new MutationObserver(() => {
-      if (!document.querySelector(`.${SWITCHER_CLASS}`)) callback();
-    }).observe(document.body, { childList: true, subtree: true });
   }
 
-  const versionsPromise = loadVersions(resolveSiteRoot());
   onPageReady(() => versionsPromise.then(render));
 })();

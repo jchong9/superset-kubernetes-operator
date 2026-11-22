@@ -14,6 +14,8 @@
       
       
       
+        <link rel="prev" href="../development-guidelines/">
+      
       
       
         
@@ -238,7 +240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -681,7 +683,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/reference/downloads/" class="md-nav__link">
+      <a href="../../reference/downloads/" class="md-nav__link">
         
   
   
@@ -708,7 +710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/reference/releases/" class="md-nav__link">
+      <a href="../../reference/releases/" class="md-nav__link">
         
   
   
@@ -735,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/reference/security/" class="md-nav__link">
+      <a href="../../reference/security/" class="md-nav__link">
         
   
   
@@ -767,8 +769,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -779,13 +783,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
@@ -806,7 +808,7 @@
           </label>
         
         
-          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
             <label class="md-nav__title" for="__nav_6">
               <span class="md-nav__icon md-icon"></span>
               
@@ -823,7 +825,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/contributing/development-setup/" class="md-nav__link">
+      <a href="../development-setup/" class="md-nav__link">
         
   
   
@@ -850,7 +852,7 @@
   
   
     <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/contributing/development-guidelines/" class="md-nav__link">
+      <a href="../development-guidelines/" class="md-nav__link">
         
   
   
@@ -874,10 +876,36 @@
                   
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="/superset-kubernetes-operator/contributing/releasing/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Releasing
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
@@ -892,6 +920,204 @@
   
 
       </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ci-supply-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        CI &amp; Supply Chain
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CI &amp; Supply Chain">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#github-actions-pinning" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        GitHub Actions pinning
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-binary-pinning" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Tool binary pinning
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Workflow permissions
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#renovate" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Renovate
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Versioning
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#release-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Release Checklist
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reviewing-the-changelog" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Reviewing the Changelog
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#creating-a-release-candidate" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Creating a Release Candidate
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#asf-source-release-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        ASF Source Release Artifacts
+      </span>
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ASF Source Release Artifacts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pre-requisites-for-the-release-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Pre-requisites for the release manager
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#producing-the-source-tarball" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Producing the source tarball
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#staging-the-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Staging the artifacts
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vote-email-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Vote email template
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finalizing-a-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Finalizing a Release
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1461,6 +1687,7 @@ under the License.
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["content.code.copy","navigation.sections","navigation.expand","navigation.top","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
+      <script src="../../javascripts/search-index-router.js" data-versions="[&quot;0.1&quot;,&quot;0.3&quot;,&quot;1.0&quot;,&quot;1.1&quot;]"></script>
       <script src="../../assets/javascripts/bundle.d31f0ffa.min.js"></script>
       
         <script src="../../javascripts/version-switcher.js"></script>
