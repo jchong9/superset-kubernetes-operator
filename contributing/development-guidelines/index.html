@@ -14,10 +14,6 @@
       
       
       
-        <link rel="prev" href="../development-setup/">
-      
-      
-        <link rel="next" href="../releasing/">
       
       
         
@@ -242,7 +238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="/superset-kubernetes-operator/" class="md-nav__link">
         
   
   
@@ -685,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/downloads/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/downloads/" class="md-nav__link">
         
   
   
@@ -712,7 +708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/releases/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/releases/" class="md-nav__link">
         
   
   
@@ -739,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/security/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/security/" class="md-nav__link">
         
   
   
@@ -771,8 +767,6 @@
       
   
   
-    
-  
   
   
     
@@ -785,11 +779,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
           <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
@@ -810,7 +806,7 @@
           </label>
         
         
-          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
             <label class="md-nav__title" for="__nav_6">
               <span class="md-nav__icon md-icon"></span>
               
@@ -827,7 +823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../development-setup/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/development-setup/" class="md-nav__link">
         
   
   
@@ -851,36 +847,10 @@
                   
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Development Guidelines
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="././" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="/superset-kubernetes-operator/contributing/development-guidelines/" class="md-nav__link">
         
   
   
@@ -895,492 +865,6 @@
   
 
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Architecture
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Architecture">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#top-level-defaults-and-per-component-overrides" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Top-level defaults and per-component overrides
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#external-connection-values" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        External connection values
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enumerated-fields" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Enumerated fields
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-philosophy" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Testing Philosophy
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Testing Philosophy">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#guiding-principle-assert-on-observable-outputs" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Guiding principle: assert on observable outputs
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#security-and-the-threat-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Security and the threat model
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-pyramid" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Test pyramid
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#test-granularity" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Test granularity
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-goes-where" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        What goes where
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#running-e2e-tests-locally" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Running E2E tests locally
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#writing-a-new-unit-test" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Writing a new unit test
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-pure-packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Testing pure packages
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#fuzzing" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Fuzzing
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#helm-chart-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Helm chart tests
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#license-headers" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        License Headers
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#automation-principle" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Automation Principle
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation-style" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Documentation Style
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dos-and-donts" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Do's and Don'ts
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Do&#x27;s and Don&#x27;ts">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#do" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Do
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dont" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Don't
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-add-a-new-field" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        How to Add a New Field
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-add-a-new-component" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        How to Add a New Component
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#package-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Package Structure
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-files-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Key Files Reference
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#metrics" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Metrics
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Metrics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#operator-metrics-own-process" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Operator metrics (own process)
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#superset-instance-monitoring" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Superset instance monitoring
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Logging
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Logging">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#three-tiers" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Three tiers
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-logging" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Error logging
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cross-cutting-rule" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Cross-cutting rule
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conventions" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Conventions
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#enabling-verbose-logs-when-debugging" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Enabling verbose logs when debugging
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pull-requests" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Pull Requests
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Pull Requests">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#title-format" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Title format
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#description" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Description
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#changelog-entry" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Changelog entry
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#code-coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Code coverage
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1393,7 +877,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../releasing/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/releasing/" class="md-nav__link">
         
   
   
@@ -2595,7 +2079,6 @@ for noteworthy changes — new features, new CRD fields, behavior changes, break
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["content.code.copy","navigation.sections","navigation.expand","navigation.top","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../javascripts/search-index-router.js" data-versions="[&quot;0.1&quot;,&quot;0.3&quot;,&quot;1.0&quot;,&quot;1.1&quot;]"></script>
       <script src="../../assets/javascripts/bundle.d31f0ffa.min.js"></script>
       
         <script src="../../javascripts/version-switcher.js"></script>

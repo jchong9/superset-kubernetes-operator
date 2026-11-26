@@ -14,10 +14,6 @@
       
       
       
-        <link rel="prev" href="../releases/">
-      
-      
-        <link rel="next" href="../../contributing/development-setup/">
       
       
         
@@ -242,7 +238,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="/superset-kubernetes-operator/" class="md-nav__link">
         
   
   
@@ -602,8 +598,6 @@
       
   
   
-    
-  
   
   
     
@@ -616,11 +610,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
@@ -641,7 +637,7 @@
           </label>
         
         
-          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
             <label class="md-nav__title" for="__nav_5">
               <span class="md-nav__icon md-icon"></span>
               
@@ -685,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../downloads/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/downloads/" class="md-nav__link">
         
   
   
@@ -712,7 +708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../releases/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/reference/releases/" class="md-nav__link">
         
   
   
@@ -736,36 +732,10 @@
                   
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-  Security
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="././" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="/superset-kubernetes-operator/reference/security/" class="md-nav__link">
         
   
   
@@ -780,238 +750,6 @@
   
 
       </a>
-      
-        
-
-
-<nav class="md-nav md-nav--secondary" aria-label="On this page">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      On this page
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#trust-boundaries" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Trust Boundaries
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Trust Boundaries">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-public-crd" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Single Public CRD
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#serviceaccount-selection-is-part-of-cr-write-access" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        ServiceAccount Selection Is Part of CR Write Access
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#security-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Security Model
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Security Model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#productionstaging-vs-development-mode" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Production/Staging vs Development Mode
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#secret-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Secret Handling
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#raw-python-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Raw Python Configuration
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#crd-validation" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        CRD Validation
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#design-decisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Design Decisions
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rbac-justification" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        RBAC Justification
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RBAC Justification">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#install-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Install Scope
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-in-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        What Is In Scope
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#supply-chain" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Supply Chain
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-generally-out-of-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        What Is Generally Out of Scope
-      </span>
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#reporting-vulnerabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Reporting Vulnerabilities
-      </span>
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Reporting Vulnerabilities">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#supported-versions" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Supported Versions
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#component-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      <span class="md-typeset">
-        Component Scope
-      </span>
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1085,7 +823,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/development-setup/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/development-setup/" class="md-nav__link">
         
   
   
@@ -1112,7 +850,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/development-guidelines/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/development-guidelines/" class="md-nav__link">
         
   
   
@@ -1139,7 +877,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/releasing/" class="md-nav__link">
+      <a href="/superset-kubernetes-operator/contributing/releasing/" class="md-nav__link">
         
   
   
@@ -1814,7 +1552,6 @@ shows recommended settings. Workload hardening beyond these defaults is the user
       <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["content.code.copy","navigation.sections","navigation.expand","navigation.top","search.highlight"],"redirect":null,"search":"../../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="../../javascripts/search-index-router.js" data-versions="[&quot;0.1&quot;,&quot;0.3&quot;,&quot;1.0&quot;,&quot;1.1&quot;]"></script>
       <script src="../../assets/javascripts/bundle.d31f0ffa.min.js"></script>
       
         <script src="../../javascripts/version-switcher.js"></script>
